@@ -1,0 +1,37 @@
+# depslib dependency file v1.0
+1488195282 source:c:\sourcecode\qxldump\src\qxdoptions.cpp
+	"QXDOptions.h"
+
+1488199290 c:\sourcecode\qxldump\include\qxdoptions.h
+	<string>
+	<iostream>
+	<fstream>
+
+1488199996 source:c:\sourcecode\qxldump\src\qxdqxlwin.cpp
+	"QXDQxlWin.h"
+
+1488209602 c:\sourcecode\qxldump\include\qxdqxlwin.h
+	<iostream>
+	<iomanip>
+	<fstream>
+	"QXDOptions.h"
+	"QXLHeader.h"
+
+1488200079 source:c:\sourcecode\qxldump\src\qxldump.cpp
+	"QXLDump.h"
+	"QXDOptions.h"
+	"QXDQxlWin.h"
+
+1488192909 c:\sourcecode\qxldump\include\qxldump.h
+	<iostream>
+	<fstream>
+	<string>
+	<exception>
+	"Thousands.h"
+
+1488192886 c:\sourcecode\qxldump\include\thousands.h
+	<string>
+	<iomanip>
+
+1488205549 c:\sourcecode\qxldump\include\qxlheader.h
+

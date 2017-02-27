@@ -27,3 +27,11 @@
 *.exe
 *.out
 *.app
+
+# My Stuff
+bin/*
+obj/*
+testFiles/*
+*.save
+include/*.save
+src/*.save

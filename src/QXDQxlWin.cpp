@@ -23,6 +23,7 @@
  */
 
 #include "QXDQxlWin.h"
+#include "css.h"
 
 QXDQxlWin::QXDQxlWin(QXDOptions *opt)
 {
@@ -58,8 +59,10 @@ bool QXDQxlWin::QXDOpenFile()
     mIfs = new ifstream(mOptions->QXDQxlFile(), std::ios_base::binary|std::ios_base::in);
     cerr << mOptions->QXDQxlFile() << " opened." << endl;
 
-    // Read in the file header.
-    mIfs->read((char *)&Header, QXLHeaderLength);
+    // Read in the file header. Field by bloody field.
+    // Because the QL is intelligent and has numbers stored big endian
+    // but the PC is arse about face aka little endian.
+    readHeader();
 
     // Do we have a QXL.WIN?
     if (!(Header.qwa_id[0] == 'Q' &&
@@ -72,14 +75,14 @@ bool QXDQxlWin::QXDOpenFile()
         return false;
     }
 
-    reverseHeader();
 
     // Write out the HTML or TEXT headings etc.
     if (mOptions->QXDHtml()) {
         // HTML required.
-        cout << "<html><head><title>QXLDump</title></head>" << endl << "<body>" << endl;
+        cout << "<html>" << endl << "<head>" << endl << "<title>QXLDump</title>" << endl
+             << cssText << "</head>" << endl << "<body>" << endl;
         cout << "<h1>QXLDump</H1>" << endl;
-        cout << "<p>" << mOptions->QXDQxlFile() << "</p>" << endl << endl;
+        cout << "<p><strong>" << mOptions->QXDQxlFile() << "</strong></p>" << endl << endl;
 
     } else {
         // TEXT required.
@@ -95,51 +98,101 @@ void QXDQxlWin::doHeader()
 {
     uint16_t offset = 0;
     // Dump the QXL.WIN header.
-    cout << "<table>" << endl
-         << "<tr><th>Offset Hex</th>"
-         << "<th>Offset Dec</th>"
-         << "<th>Mnemonic</th>"
-         << "<th>Value</th>"
+    cout << "<h2>File Header</h2>" << endl;
+    cout << "<table style=\"width:95%\">" << endl
+         << "<tr><th style=\"width:5%\";>Offset Hex</th>"
+         << "<th style=\"width:5%\";>Offset Dec</th>"
+         << "<th style=\"width:10%\";>Mnemonic</th>"
+         << "<th style=\"width:10%\";>Value</th>"
          << "<th>Description</th></tr>" << endl;
 
     // Header data. ID bytes.
-    cout << "<tr><td>$"
-         << setbase(16) << setw(4) << setfill('0') << offset << "</td>"
-         << "<td>"
-         << setbase(10) << setw(0) << setfill(' ') << offset << "</td>"
-         << "<td>qwa_id</td>"
-         << "<td>" << Header.qwa_id[0]
+    displayOffset(offset, 4, "qwa_id");
+     cout << "<td class=\"number\">" << Header.qwa_id[0]
                    << Header.qwa_id[1]
                    << Header.qwa_id[2]
                    << Header.qwa_id[3] << "</td>"
-         << "<td>QLWA Identification bytes.</td></tr>" << endl;
+         << "<td class=\"text\">QLWA Identification bytes.</td></tr>" << endl;
 
     // Header data. Name Size.
     offset += 4;
-    cout << "<tr><td>$"
-         << setbase(16) << setw(4) << setfill('0') << offset << "</td>"
-         << "<td>"
-         << setbase(10) << setw(0) << setfill(' ') << offset << "</td>"
-         << "<td>qwa_name_size</td>"
-         << "<td>" << Header.qwa_name_size << "</td>"
-         << "<td>Size of QXL.WIN file name.</td></tr>" << endl;
+    displayData(offset, 4, Header.qwa_name_size, "qwa_name_size", "Size of QXL.WIN file name.");
 
     // Header data. Name.
     offset += 2;
-    cout << "<tr><td>$"
-         << setbase(16) << setw(4) << setfill('0') << offset << "</td>"
-         << "<td>"
-         << setbase(10) << setw(0) << setfill(' ') << offset << "</td>"
-         << "<td>qwa_name</td>"
-         << "<td>";
+    displayOffset(offset, 4, "qwa_name");
 
+    cout << "<td class=\"number\">";
     for (unsigned x = 0; x < 20; x++) {
         cout << Header.qwa_name[x];
     }
+    cout <<  "</td><td class=\"text\">Bytes of QXL.WIN file name.</td></tr>" << endl;
 
-    cout <<  "</td>"
-         << "<td>Bytes of QXL.WIN file name.</td></tr>" << endl;
 
+    // Header data. Spare 0.
+    offset += 20;
+    displayData(offset, 4, Header.qwa_spr0, "qwa_spr0", "Spare. Should be zero.");
+
+    // Header data. Update Check.
+    offset += 2;
+    displayData(offset, 8, Header.qwa_uchk, "qwa_uchk", "Update counter. First word is random. Second is counter.");
+
+    // Header data. Interleave factor.
+    offset += 4;
+    displayData(offset, 4, Header.qwa_intl, "qwa_intl", "Interleave factor.");
+
+    // Header data. Sectors per group.
+    offset += 2;
+    displayData(offset, 4, Header.qwa_sctg, "qwa_sctg", "Sectors per group.");
+
+    // Header data. Sectors per track.
+    offset += 2;
+    displayData(offset, 4, Header.qwa_sctt, "qwa_sctt", "Sectors per track.");
+
+    // Header data. Tracks per cylinder.
+    offset += 2;
+    displayData(offset, 4, Header.qwa_trkc, "qwa_trkc", "Tracks per cylinder.");
+
+    // Header data. Cylinders per drive.
+    offset += 2;
+    displayData(offset, 4, Header.qwa_cyld, "qwa_cyld", "Cylinders per drive.");
+
+    // Header data. Number of groups.
+    offset += 2;
+    displayData(offset, 4, Header.qwa_ngrp, "qwa_ngrp", "Number of groups.");
+
+    // Header data. Number of free groups.
+    offset += 2;
+    displayData(offset, 4, Header.qwa_fgrp, "qwa_fgrp", "Number of free groups.");
+
+    // Header data. Sectors per map.
+    offset += 2;
+    displayData(offset, 4, Header.qwa_sctm, "qwa_sctm", "Sectors per map.");
+
+    // Header data. Number of maps.
+    offset += 2;
+    displayData(offset, 4, Header.qwa_nmap, "qwa_nmap", "Number of maps.");
+
+    // Header data. First Free Group.
+    offset += 2;
+    displayData(offset, 4, Header.qwa_free, "qwa_free", "First free group.");
+
+    // Header data. Root Directory FileID.
+    offset += 2;
+    displayData(offset, 4, Header.qwa_root, "qwa_root", "Root directory file number.");
+
+    // Header data. Root directory length.
+    offset += 2;
+    displayData(offset, 8, Header.qwa_rlen, "qwa_rlen", "Root directory length.");
+
+    // Header data. First cylinder/sector.
+    offset += 4;
+    displayData(offset, 8, Header.qwa_first.qwa_fcyl, "qwa_fcyl", "First cylinder (word) *** OR ***");
+    displayData(offset, 4, Header.qwa_first.qwa_fsct, "qwa_fsct", "First sector (long word).");
+
+    // Header data. .
+    offset += 4;
+    displayData(offset, 4, Header.qwa_park, "qwa_park", "Parking cylinder.");
 
 
     // Close the table.
@@ -147,57 +200,88 @@ void QXDQxlWin::doHeader()
 }
 
 
-void QXDQxlWin::reverseHeader()
+void QXDQxlWin::displayData(uint16_t &offset, const uint16_t width, const uint32_t value, const string name, const string description)
+{
+    // Display details about the fields in the header. Each
+    // is added as a complete row in the table.
+    displayOffset(offset, width, name);
+    cout << "<td class=\"number\">" << value << "</td>"
+         << "<td class=\"text\">" << description << "</td></tr>" << endl;
+}
+
+void QXDQxlWin::displayOffset(uint16_t &offset, const uint16_t width, const string name)
+{
+    // Display details about the offsets etc for the header data
+    // but excludes the value and description.
+    // We have the following:
+    //
+    // OFFSET(hex) OFFSET(dec) NAME.
+    cout << "<tr><td class=\"number\">$"
+         << setbase(16) << setw(4) << setfill('0') << offset << "</td>"
+         << "<td class=\"number\">"
+         << setbase(10) << setw(0) << setfill(' ') << offset << "</td>"
+         << "<td class=\"text\">" << name << "</td>";
+}
+
+void QXDQxlWin::readHeader()
 {
     // Convert from QL big endian format to PC/Linux little endian.
-
-    cerr << "Name size " << Header.qwa_name_size << endl;
-    Header.qwa_name_size = reverseWord(Header.qwa_name_size);
-    cerr << "Name size " << Header.qwa_name_size << endl;
-    Header.qwa_spr0 = reverseWord(Header.qwa_spr0);
-    Header.qwa_uchk = reverseLong(Header.qwa_uchk);
-    Header.qwa_intl = reverseWord(Header.qwa_intl);
-    Header.qwa_sctg = reverseWord(Header.qwa_sctg);
-    Header.qwa_sctt = reverseWord(Header.qwa_sctt);
-    Header.qwa_trkc = reverseWord(Header.qwa_trkc);
-    Header.qwa_cyld = reverseWord(Header.qwa_cyld);
-    Header.qwa_ngrp = reverseWord(Header.qwa_ngrp);
-    Header.qwa_fgrp = reverseWord(Header.qwa_fgrp);
-    Header.qwa_sctm = reverseWord(Header.qwa_sctm);
-    Header.qwa_nmap = reverseWord(Header.qwa_nmap);
-    Header.qwa_free = reverseWord(Header.qwa_free);
-    Header.qwa_root = reverseWord(Header.qwa_root);
-    Header.qwa_rlen = reverseLong(Header.qwa_rlen);
-    Header.qwa_first.qwa_fsct = reverseLong(Header.qwa_first.qwa_fsct);
-    Header.qwa_park = reverseWord(Header.qwa_park);
+    mIfs->read(&Header.qwa_id[0], 4);
+    Header.qwa_name_size = getWord();
+    mIfs->read(&Header.qwa_name[0], 20);
+    Header.qwa_spr0 = getWord();
+    Header.qwa_uchk = getLong();
+    Header.qwa_intl = getWord();
+    Header.qwa_sctg = getWord();
+    Header.qwa_sctt = getWord();
+    Header.qwa_trkc = getWord();
+    Header.qwa_cyld = getWord();
+    Header.qwa_ngrp = getWord();
+    Header.qwa_fgrp = getWord();
+    Header.qwa_sctm = getWord();
+    Header.qwa_nmap = getWord();
+    Header.qwa_free = getWord();
+    Header.qwa_root = getWord();
+    Header.qwa_rlen = getLong();
+    Header.qwa_first.qwa_fsct = getLong();
+    Header.qwa_park = getWord();
 }
 
-uint16_t QXDQxlWin::reverseWord(uint16_t word)
-{
-    // Reverse big endian word to little endian.
-   union {
-       char bytes[2];
-       uint16_t word;
-   } temp;
+uint8_t QXDQxlWin::getByte() {
+    // Read an unsigned byte from the qxl.win file.
+    char c;
+    uint8_t result;
 
-   temp.word = word;
-   return temp.bytes[0]  << 8 | temp.bytes[1];
+    mIfs->get(c);    // Signed.
+    result = c;     // Unsigned. But -2 becomes 2.
+    if (c < 0)
+        result += 256;
 
-   // $0004 = $04 $00 <--> $00 $04
+    return result;
 }
 
-uint32_t QXDQxlWin::reverseLong(uint32_t longWord)
-{
-    // Reverse big endian longword to little endian.
-    union {
-        uint32_t longWord;
-        uint16_t words[2];
-    } temp;
 
-    temp.longWord = longWord;
-    temp.words[0] = reverseWord(temp.words[0]);
-    temp.words[1] = reverseWord(temp.words[1]);
+uint16_t QXDQxlWin::getWord() {
+    // Read a big endian word from a qxl.win file.
+    uint16_t result = 0;
 
-    return temp.words[0] << 16 | temp.words[1];
+    result = getByte();
+    result *= 256;
+    result += getByte();
+
+    return result;
 }
+
+
+uint32_t QXDQxlWin::getLong() {
+    // Read  big endian long word from a qxl.win file.
+    uint32_t result = 0;
+
+    result = getWord();
+    result *= 65536;
+    result += getWord();
+
+    return result;
+}
+
 

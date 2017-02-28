@@ -58,10 +58,12 @@ class QXDQxlWin
         ifstream *mIfs;
         QXLHeader Header;
         bool QXDOpenFile();
-        void reverseHeader();
-        uint16_t reverseWord(uint16_t word);
-        uint32_t reverseLong(uint32_t longWord);
-
+        void displayData(uint16_t &offset, const uint16_t width, const uint32_t value, const string name, const string description);
+        void displayOffset(uint16_t &offset, const uint16_t width, const string name);
+        uint8_t getByte();
+        uint16_t getWord();
+        uint32_t getLong();
+        void readHeader();
 };
 
 #endif // QXDQXLWIN_H

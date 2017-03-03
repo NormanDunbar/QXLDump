@@ -57,11 +57,14 @@ int main(int argc, char *argv[])
     if (!(options.QXDheader() ||
           options.QXDmap() ||
           options.QXDData() ||
-          options.QXDFile()))
+          options.QXDFile() ||
+          options.QXDRoot() ||
+          options.QXDFree()))
     {
         cerr << "QXLDump: No dump options supplied." << endl
-             << "Defaulting to '--header'." << endl;
+             << "Defaulting to '--header --root'." << endl;
 
+        // Sets the header AND root flags!
         options.setHeader(true);
     }
 
@@ -75,6 +78,31 @@ int main(int argc, char *argv[])
     // --Header requested?
     if (options.QXDheader()) {
         qxl->doHeader();
+    }
+
+    // --Map requested?
+    if (options.QXDmap()) {
+        qxl->doMap();
+    }
+
+    // --Root requested?
+    if (options.QXDRoot()) {
+        qxl->doRoot();
+    }
+
+    // --Data requested?
+    if (options.QXDData()) {
+        qxl->doData();
+    }
+
+    // --Free requested?
+    if (options.QXDFree()) {
+        qxl->doFree();
+    }
+
+    // --File requested?
+    if (options.QXDFile()) {
+        qxl->doFile(options.QXDFileId());
     }
 
 

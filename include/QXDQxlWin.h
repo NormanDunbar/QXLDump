@@ -28,6 +28,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <string>
 
 #include "QXDOptions.h"
 #include "QXLHeader.h"
@@ -39,6 +40,7 @@ using std::cerr;
 using std::setw;
 using std::setfill;
 using std::setbase;
+using std::string;
 
 class QXDQxlWin
 {
@@ -48,8 +50,10 @@ class QXDQxlWin
 
         void doHeader();
         void doMap();
+        void doRoot();
         void doData();
-        void doFile();
+        void doFree();
+        void doFile(uint16_t fileId);
 
     protected:
 
@@ -57,13 +61,18 @@ class QXDQxlWin
         QXDOptions *mOptions;
         ifstream *mIfs;
         QXLHeader Header;
+        uint32_t *mQXLMap;
         bool QXDOpenFile();
+        bool getMapBlockData(const uint16_t blockId, uint16_t &nextBlock, uint32_t &blockFileAddress);
+        string getBlockChain(const uint16_t blockId);
+        string getBlockChainTable(const uint16_t blockId);
         void displayData(uint16_t &offset, const uint16_t width, const uint32_t value, const string name, const string description);
         void displayOffset(uint16_t &offset, const uint16_t width, const string name);
         uint8_t getByte();
         uint16_t getWord();
         uint32_t getLong();
         void readHeader();
+        void readMap();
 };
 
 #endif // QXDQXLWIN_H

@@ -53,8 +53,14 @@ class QXDOptions
         // Are we dumping the map?
         bool QXDmap() { return mMap; }
 
+        // Are we dumping the root directory?
+        bool QXDRoot() { return mRoot; }
+
         // Are we dumping the data blocks?
         bool QXDData() { return mData; }
+
+        // Are we dumping the free space?
+        bool QXDFree() { return mFree; }
 
         // Are we dumping a single file or directory?
         bool QXDFile() { return mFile; }
@@ -66,7 +72,7 @@ class QXDOptions
         string QXDQxlFile() { return mQXLFile; }
 
         // Setters.
-        void setHeader( bool val) { mHeader = val; }
+        void setHeader( bool val) { mHeader = val; mRoot = val; }
 
         // Others.
         // How to call the utility.
@@ -83,7 +89,9 @@ class QXDOptions
         bool mHelp;
         bool mHeader;
         bool mMap;
+        bool mRoot;
         bool mData;
+        bool mFree;
         bool mFile;
         uint16_t mFileId = 0;
 

@@ -65,17 +65,29 @@ string cssText =
     + "    color: maroon;" + eol
     + "}" + eol
     + eol
-    + ".number {" + eol
+    + ".right {" + eol
     + "    text-align: right;" + eol
     + "    padding-right: 3px;" + eol
     + "    vertical-align: top;" + eol
     + "}" + eol
     + eol
-    + ".text {" + eol
+    + ".left {" + eol
     + "    text-align: left;" + eol
     + "    padding-left: 3px;" + eol
     + "    vertical-align: top;" + eol
     + "}"
+    + eol
+    + ".middle {" + eol
+    + "    text-align: center;" + eol
+    + "    padding-right: 3px;" + eol
+    + "    vertical-align: top;" + eol
+    + "}" + eol
+    + ".hidden {" + eol
+    + "    background: ivory;" + eol
+    + "    border-left: 1px solid ivory;" + eol
+    + "    border-top: 1px solid ivory;" + eol
+    + "    border-bottom: 1px solid ivory;" + eol
+    + "}" + eol
     + "</style>" + eol;
 
 #endif // CSS_H

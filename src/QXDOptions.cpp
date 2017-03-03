@@ -31,7 +31,9 @@ QXDOptions::QXDOptions()
     mHtml = true;
     mHeader = false;
     mMap = false;
+    mRoot = false;
     mData = false;
+    mFree = false;
     mFile = false;
     mFileId = 0;
     mQXLFile = "";
@@ -68,6 +70,8 @@ bool QXDOptions::parseArgs(int argc, char *argv[]) {
             mHeader = true;
             mMap = true;
             mData = true;
+            mRoot = true;
+            mFree = true;
             continue;
         }
 
@@ -85,9 +89,23 @@ bool QXDOptions::parseArgs(int argc, char *argv[]) {
             continue;
         }
 
+        // Try ROOT ...
+        if ((thisArg == "--root") ||
+            (thisArg == "-r")) {
+            mRoot = true;
+            continue;
+        }
+
         // Try DATA ...
         if ((thisArg == "--data") ||
             (thisArg == "-d")) {
+            mData = true;
+            continue;
+        }
+
+        // Try FREE ...
+        if ((thisArg == "--free") ||
+            (thisArg == "-e")) {
             mData = true;
             continue;
         }
@@ -114,13 +132,6 @@ bool QXDOptions::parseArgs(int argc, char *argv[]) {
                 mFile = true;
             }
 
-            continue;
-        }
-
-        // Ok, try TEXT instead ...
-        if ((thisArg == "--text") ||
-            (thisArg == "-t")) {
-            mHtml = false;
             continue;
         }
 
@@ -213,20 +224,18 @@ void QXDOptions::usage() {
     cerr << "'QXLWIN_file' is the file name of the qxl.win file to be dumped." << endl << endl;
 
     cerr << "OPTIONS:" << endl << endl;
-
     cerr << "'-?' or '--help' Displays this help, and exits." << endl;
-
-    cerr << "'-t' or '--text' Turn off HTML mode. The output will be in TEXT format." << endl;
-    cerr << "The default is for the output to be in HTML format." << endl << endl;
-
     cerr << "'-h' or '--header' Displays the file header." << endl;
     cerr << "'-m' or '--map' Displays the file map." << endl;
+    cerr << "'-r' or '--root' Displays the root directory." << endl;
     cerr << "'-d' or '--data' Displays the file's (used) data." << endl;
-    cerr << "'-a' or '--all' Sets '--header', '--map' and '--data' as a shortcut." << endl;
+    cerr << "'-e' or '--free' Displays the file's free space." << endl;
+    cerr << "'-a' or '--all' Sets '--header', '--map', '--root', '--data' amd '--free'." << endl;
     cerr << "'-f=n' or '--file=n' Displays the file with FileId 'n'." << endl << endl;
 
     cerr << "OUTPUT:" << endl << endl;
     cerr << "Output is written to 'stdout' and so, can be easily redirected to a file." << endl;
+    cerr << "Errors etc are written to 'stderr' and won't interfere with the data on 'stdout'." << endl;
 }
 
 

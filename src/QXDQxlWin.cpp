@@ -22,13 +22,25 @@
  * SOFTWARE.
  */
 
+#include <sstream>
+
+using std::stringstream;
+
+
 #include "QXDQxlWin.h"
 #include "css.h"
+#include "rootDir.h"
+
+// A constant to be used to set a bit to indicate that this
+// particular map block is NOT the first in a file.
+const uint32_t blockinFile = (1 << 16);
+const uint32_t blockFree = (1 << 17);
 
 QXDQxlWin::QXDQxlWin(QXDOptions *opt)
 {
     mOptions = opt;
     mIfs = NULL;
+    mQXLMap = NULL;
     QXDOpenFile();
 }
 
@@ -39,6 +51,11 @@ QXDQxlWin::~QXDQxlWin()
         mIfs->close();
         delete mIfs;
         cerr << mOptions->QXDQxlFile() << " closed." << endl;
+    }
+
+    // If we allocated a map, delete it.
+    if (mQXLMap) {
+        delete [] mQXLMap;
     }
 
     // Close the output file.
@@ -64,6 +81,9 @@ bool QXDQxlWin::QXDOpenFile()
     // but the PC is arse about face aka little endian.
     readHeader();
 
+    // Read in the map blocks.
+    readMap();
+
     // Do we have a QXL.WIN?
     if (!(Header.qwa_id[0] == 'Q' &&
           Header.qwa_id[1] == 'L' &&
@@ -76,13 +96,13 @@ bool QXDQxlWin::QXDOpenFile()
     }
 
 
-    // Write out the HTML or TEXT headings etc.
+    // Write out the HTML headings etc.
     if (mOptions->QXDHtml()) {
         // HTML required.
         cout << "<html>" << endl << "<head>" << endl << "<title>QXLDump</title>" << endl
              << cssText << "</head>" << endl << "<body>" << endl;
         cout << "<h1>QXLDump</H1>" << endl;
-        cout << "<p><strong>" << mOptions->QXDQxlFile() << "</strong></p>" << endl << endl;
+        cout << "<p><strong>Qxl.win File Name: </strong>" << mOptions->QXDQxlFile() << "</p>" << endl << endl;
 
     } else {
         // TEXT required.
@@ -99,6 +119,9 @@ void QXDQxlWin::doHeader()
     uint16_t offset = 0;
     // Dump the QXL.WIN header.
     cout << "<h2>File Header</h2>" << endl;
+    cout << "The header of the qxl.win file starts at offset zero in the physical file. It takes up the first "
+         << "64 ($0040) bytes of the file.</p>" << endl;
+
     cout << "<table style=\"width:95%\">" << endl
          << "<tr><th style=\"width:5%\";>Offset Hex</th>"
          << "<th style=\"width:5%\";>Offset Dec</th>"
@@ -108,7 +131,7 @@ void QXDQxlWin::doHeader()
 
     // Header data. ID bytes.
     displayOffset(offset, 4, "qwa_id");
-     cout << "<td class=\"number\">" << Header.qwa_id[0]
+     cout << "<td class=\"right\">" << Header.qwa_id[0]
                    << Header.qwa_id[1]
                    << Header.qwa_id[2]
                    << Header.qwa_id[3] << "</td>"
@@ -122,7 +145,7 @@ void QXDQxlWin::doHeader()
     offset += 2;
     displayOffset(offset, 4, "qwa_name");
 
-    cout << "<td class=\"number\">";
+    cout << "<td class=\"right\">";
     for (unsigned x = 0; x < 20; x++) {
         cout << Header.qwa_name[x];
     }
@@ -159,11 +182,11 @@ void QXDQxlWin::doHeader()
 
     // Header data. Number of groups.
     offset += 2;
-    displayData(offset, 4, Header.qwa_ngrp, "qwa_ngrp", "Number of groups.");
+    displayData(offset, 4, Header.qwa_ngrp, "qwa_ngrp", "Total number of groups.");
 
     // Header data. Number of free groups.
     offset += 2;
-    displayData(offset, 4, Header.qwa_fgrp, "qwa_fgrp", "Number of free groups.");
+    displayData(offset, 4, Header.qwa_fgrp, "qwa_fgrp", "Number of free or unusable groups.");
 
     // Header data. Sectors per map.
     offset += 2;
@@ -194,9 +217,16 @@ void QXDQxlWin::doHeader()
     offset += 4;
     displayData(offset, 4, Header.qwa_park, "qwa_park", "Parking cylinder.");
 
+    cout << "<tr><td>&nbsp;</td><td class=\"right\" colspan=\"2\"><strong>Total Disc Size:<strong></td><td class=\"right\">"
+         << (float)(Header.qwa_ngrp * Header.qwa_sctg * 512) / 1024 << "</td><td>"
+         << "Disc size in Kb.</td></tr>" << endl;
+
+    cout << "<tr><td>&nbsp;</td><td class=\"right\" colspan=\"2\"><strong>Total Free Space:<strong></td><td class=\"right\">"
+         << (float)(Header.qwa_fgrp * Header.qwa_sctg * 512) / 1024 << "</td><td>"
+         << "Free space in Kb.</td></tr>" << endl;
 
     // Close the table.
-    cout << "</table>" << endl << "<hr>" << endl << endl;
+    cout << "</table>" << endl << "<hr>" << endl << endl;;
 }
 
 
@@ -205,8 +235,8 @@ void QXDQxlWin::displayData(uint16_t &offset, const uint16_t width, const uint32
     // Display details about the fields in the header. Each
     // is added as a complete row in the table.
     displayOffset(offset, width, name);
-    cout << "<td class=\"number\">" << value << "</td>"
-         << "<td class=\"text\">" << description << "</td></tr>" << endl;
+    cout << "<td class=\"right\">" << value << "</td>"
+         << "<td class=\"left\">" << description << "</td></tr>" << endl;
 }
 
 void QXDQxlWin::displayOffset(uint16_t &offset, const uint16_t width, const string name)
@@ -216,11 +246,11 @@ void QXDQxlWin::displayOffset(uint16_t &offset, const uint16_t width, const stri
     // We have the following:
     //
     // OFFSET(hex) OFFSET(dec) NAME.
-    cout << "<tr><td class=\"number\">$"
+    cout << "<tr><td class=\"right\">$"
          << setbase(16) << setw(4) << setfill('0') << offset << "</td>"
-         << "<td class=\"number\">"
+         << "<td class=\"right\">"
          << setbase(10) << setw(0) << setfill(' ') << offset << "</td>"
-         << "<td class=\"text\">" << name << "</td>";
+         << "<td class=\"left\">" << name << "</td>";
 }
 
 void QXDQxlWin::readHeader()
@@ -245,6 +275,24 @@ void QXDQxlWin::readHeader()
     Header.qwa_rlen = getLong();
     Header.qwa_first.qwa_fsct = getLong();
     Header.qwa_park = getWord();
+}
+
+void QXDQxlWin::readMap()
+{
+    // Allocate some space for the maximum map entries.
+    // Used + free.
+    uint16_t maxBlocks = Header.qwa_ngrp;
+
+    // We are using 32 bit wide entries as we use the top
+    // word for some flags.
+    mQXLMap = new uint32_t[maxBlocks];
+
+    mIfs->seekg(0x40);      // Start of map in file.
+
+    // Read in each and every entry as a 16 bit unsigned word.
+    for (int mapBlock = 0; mapBlock < maxBlocks; mapBlock++) {
+        mQXLMap[mapBlock] = getWord();
+    }
 }
 
 uint8_t QXDQxlWin::getByte() {
@@ -284,4 +332,219 @@ uint32_t QXDQxlWin::getLong() {
     return result;
 }
 
+bool QXDQxlWin::getMapBlockData(const uint16_t blockId, uint16_t &nextBlock, uint32_t &blockFileAddress)
+{
+    // Given a blockId, return the block address in the map, and the
+    // Offset into the whole file where this block's data starts.
+    //
+    // The BlockID can also be a FileID as a FileId is simply the
+    // first block's BlockId in the map.
+    //
+    // The BlockId is < Header.qwa_ngrp.
+    // The blockMapAddress is 0x40 + (BlockId * 2);
+    //
+    // The blockFileAddress is BlockId * Header.wqa_sgrp * 512.
+    //
 
+    if (blockId < Header.qwa_ngrp) {
+        // We are good to go!
+        nextBlock = mQXLMap[blockId];
+        blockFileAddress = blockId * Header.qwa_sctg * 512;
+        return true;
+    } else {
+        // Oops, blockID out of range.
+        cerr << "QXLDump: getMapBlockData(): BlockID (" << blockId
+             << ") out of range. Maximum allowed is: " << Header.qwa_ngrp << "." << endl;
+        return false;
+    }
+}
+
+string QXDQxlWin::getBlockChainTable(const uint16_t blockId)
+{
+    // Return a string, containing the full definition of
+    // an HTML table, for the given block chain.
+
+    stringstream s;
+    s << "<table style=\"width:95%\">" << endl
+      << "<tr><th class=\"middle\" style=\"width:5%\">First Block</th>"
+      << "<th class=\"middle\">Map Block Chain</th></tr>"
+      << endl
+      << "<tr><td class=\"middle\">$" << setbase(16) << setw(4) << setfill('0')
+      << blockId
+      << setbase(10) << setw(0) << setfill(' ') << "</td><td class=\"left\">"
+      << getBlockChain(blockId)
+      << endl << "</td></tr>" << endl
+      << "</table>" << endl;
+
+    return s.str();
+}
+
+string QXDQxlWin::getBlockChain(const uint16_t blockId)
+{
+    // Return a string of all the blocks in a given chain.
+    // We do not return the starting block though.
+
+    // Walk the free chain blocks from the map.
+    uint32_t ignore = 0;
+    uint16_t nextBlock;
+    stringstream s;
+
+    nextBlock = blockId;
+
+    do
+    {
+        // Get the block that comes next. Bale out on error.
+        if (!getMapBlockData(nextBlock, nextBlock, ignore)) {
+            break;
+        };
+
+        if (!nextBlock) {
+            s << setbase(10) << "(END).";
+        } else {
+            s << "$" << setbase(16) << setw(4) << setfill('0') << nextBlock
+              << setw(0) << setfill(' ') << " -> ";
+        }
+
+        // Next block is already in nextFreeBlock.
+    } while (nextBlock);
+
+    return s.str();
+}
+
+
+void QXDQxlWin::doMap()
+{
+    // Dump out the map.
+    // Similar to doFree() as we dump the raw map blocks
+    // first, then attempt to analyse.
+
+    cout << "<h2>Map</h2>" << endl;
+
+    // Show the chain of map blocks for the map itself.
+    cout << "<h3>Map Location Data</h3>" << endl;
+    cout << "<p>The following table shows the locations, in the map, of the blocks used for the map itself. "
+         << "The map always starts at location $0040 on disc, and this corresponds to the first block of "
+         << "the map itself. </p>" << endl;
+
+    cout << getBlockChainTable(0) << endl;
+
+    cout << "<h3>Map Raw Data</h3>" << endl;
+
+    cout << "<p>The following table shows the dump of all " << Header.qwa_ngrp << " blocks in the map. "
+         << "Each block in the map represents a group of " << Header.qwa_sctg << " sectors of 512 bytes "
+         << "giving a minimum size of any file on this disc of " << Header.qwa_sctg * 512 << " bytes. </p>"
+         << endl
+         << "<p>To use the table below, scan down the left side till you find the top 3 digits of the "
+         << "required block number. For example, $010. Now look across the top for the lowest digit of "
+         << "the block, for example, $7. The intersection of the row and column holds the value of the "
+         << "block that comes next in this block chain. If that value is $0000, then this will be the final "
+         << "block in the chain.</p>" << endl;
+
+    cout << "<table style=\"width:95%\">" << endl
+         << "<tr><td class=\"hidden\">&nbsp;</td>"
+         << "<th class=\"middle\" colspan=\"16\">Least Significant Nibble</th></tr>" << endl
+         << "<tr><th class=\"hidden\" style=\"width:3%\">&nbsp;</th>";
+
+    // Least significant nibble across the top. ($---x)
+    for (int lowNibble = 0; lowNibble < 16; lowNibble++) {
+        cout << "<th style=\"width:2%\">$" << setbase(16) << setw(1) << lowNibble
+             << setw(0) << setfill(' ') << "</td>";
+    }
+    cout << "</tr>" << endl;
+
+    // Most significant byte plus the high nibble down the side. ($xxx_)
+    // This gives 16 columns per row. Could get messy! Max blocks is 65536
+    // which will give 4096 rows. Hmmm.
+    // Qwa_ngrp will always divide exactly by 256. In case you were wondering!
+    for (int highByte = 0; highByte < Header.qwa_ngrp/256; highByte++) {
+        for (int highNibble = 0; highNibble < 16; highNibble++) {
+            // thisWord is $xxx - everything but the lowest nibble.
+            // Use it down the left most column of the table.
+            uint16_t thisWord = (highByte * 256) + (highNibble * 16);
+            cout << "<tr><th style=\"width:2%\">$" << setbase(16) << setw(3) << setfill('0')
+                 << thisWord
+                 << setw(0) << setfill(' ') << "</td>";
+
+            // Now the (next) 16 map entries.
+            for (int lowNibble = 0; lowNibble < 16; lowNibble++) {
+                uint16_t blockId = thisWord + lowNibble;
+                cout << "<td class=\"middle\">$" << setbase(16) << setw(4) << setfill('0')
+                     << mQXLMap[blockId]
+                     << setw(0) << setfill(' ') << setbase(10) << "</td>";
+            }
+
+            cout << "</tr>" << endl;
+        }
+    }
+    cout << "</table>" << endl;
+    cout << "<hr>" << endl << endl;
+}
+
+void QXDQxlWin::doRoot()
+{
+    // Dump out the root directory.
+    cout << "<h2>Root Directory</h2>" << endl;
+    cout << "<h3>Map Location Data</h3>" << endl;
+
+    cout << "<p>The following table shows the locations, in the map, of the blocks used for the root directory. "
+         << "The root directory is the directory of the qxl.win file itself. This directory is so important "
+         << "that it's location - in the map - is stored in the file header. This allows the physical location "
+         << "within the disc itself, to be determined easily. </p>"
+         << endl
+         << "<p>The file id for the root directory in this file is $"
+         << setbase(16) << setw(4) << setfill('0') << Header.qwa_root << setbase(10) << setw(0) << setfill(' ')
+         << ".</p>" << endl;
+
+    // Show the chain of map blocks for the root directory.
+    uint16_t rootBlock = Header.qwa_root;
+    cout << getBlockChainTable(rootBlock);
+
+    cout << "<hr>" << endl << endl;
+
+}
+
+void QXDQxlWin::doData()
+{
+    // Dump out the entire data area.
+    cout << "<h2>Data Areas</h2>" << endl;
+    cout << "<h3>Map Location Data</h3>" << endl;
+    cout << "<h3>Map Analysis</h3>" << endl;
+
+    cout << "<hr>" << endl << endl;
+}
+
+void QXDQxlWin::doFree()
+{
+    // Dump out the entire free space area.
+    // There's no analysis can be done here.
+    cout << "<h2>Free Space</h2>" << endl;
+    cout << "<h3>Map Location Data</h3>" << endl;
+
+    cout << "<p>The following table shows the complete chain of free blocks in the map for this qxl.win file. "
+         << "The first block id in the chain, $"
+         << setbase(16) << setw(4) << setfill('0') << Header.qwa_free << setbase(10) << setw(0) << setfill(' ')
+         << ", in this case, will be used as the file id for the next new file or directory to be created. "
+         << "When a file or directory is deleted, the chain of blocks, making up that file or "
+         << "directory, are added at the <em>front</em> of the free space list. This means that, in essence, "
+         << "trying to undelete a file on a qxl.win, will be rather difficult. </p>"
+         << endl
+         << "<p>This file's free space contains " << Header.qwa_fgrp << " ($"
+         << setbase(16) << setw(4) << setfill('0') << Header.qwa_free << setbase(10) << setw(0) << setfill(' ')
+         << ") blocks.</p>" << endl;
+
+    uint16_t nextFreeBlock = Header.qwa_free;
+    cout << getBlockChainTable(nextFreeBlock);
+
+    cout << "<hr>" << endl << endl;
+}
+
+void QXDQxlWin::doFile(uint16_t fileId)
+{
+    // Dump out a give file, from it's fileid.
+    cout << "<h2>File: " << fileId << "</h2>" << endl;
+    cout << "<h3>Map Location Data</h3>" << endl;
+    cout << "<h3>Map Analysis</h3>" << endl;
+    cout << "<h3>File data</h3>" << endl;
+
+    cout << "<hr>" << endl << endl;
+}

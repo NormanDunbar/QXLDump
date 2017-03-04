@@ -11,8 +11,10 @@
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
 				<Option compiler="bcc" />
+				<Option parameters="c:\sourcecode\qxldump\testFiles\qxl.win" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="include" />
 				</Compiler>
 			</Target>
 		</Build>
@@ -24,7 +26,16 @@
 			<Add library="cw32mt.lib" />
 			<Add library="import32.lib" />
 		</Linker>
-		<Unit filename="main.cpp" />
+		<Unit filename="include/QXDOptions.h" />
+		<Unit filename="include/QXDQxlWin.h" />
+		<Unit filename="include/QXLDump.h" />
+		<Unit filename="include/QXLHeader.h" />
+		<Unit filename="include/Thousands.h" />
+		<Unit filename="include/css.h" />
+		<Unit filename="include/rootDir.h" />
+		<Unit filename="src/QXDOptions.cpp" />
+		<Unit filename="src/QXDQxlWin.cpp" />
+		<Unit filename="src/QXLDump.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

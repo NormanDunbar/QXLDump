@@ -23,8 +23,10 @@
  */
 
 #include <sstream>
+#include <cctype>
 
 using std::stringstream;
+using std::isprint;
 
 
 #include "QXDQxlWin.h"
@@ -499,6 +501,14 @@ void QXDQxlWin::doRoot()
     uint16_t rootBlock = Header.qwa_root;
     cout << getBlockChainTable(rootBlock);
 
+    // Show the entire root directory, as a hex dump.
+    cout << "<h3>Root Sectors</h3>" << endl;
+    cout << "<p>The following table is a hex dump of the entire directory. Please note that the first "
+         << "64 bytes (4 rows) of the dump are not part of the directory itself. They are <em>supposed</em> "
+         << "to be a copy of the directory entry for the file, but appear, simply, unused.</p>" << endl;
+
+    cout << getHexDumpTable(rootBlock) << endl;
+
     cout << "<hr>" << endl << endl;
 
 }
@@ -540,11 +550,101 @@ void QXDQxlWin::doFree()
 
 void QXDQxlWin::doFile(uint16_t fileId)
 {
-    // Dump out a give file, from it's fileid.
+    // Dump out a given file, from it's fileid.
+    // Which is just the first block in the map.
+    // Which we can use to find the file on disc too.
+
     cout << "<h2>File: " << fileId << "</h2>" << endl;
     cout << "<h3>Map Location Data</h3>" << endl;
+
+    cout << "<p>The following table shows the complete chain of blocks in the map for the data file which "
+         << "has file id = $"
+         << setbase(16) << setw(4) << setfill('0') << fileId << setbase(10) << setw(0) << setfill(' ')
+         << " (" << fileId << ").</p>" << endl;
+
+    uint16_t nextBlock = fileId;
+    cout << getBlockChainTable(nextBlock);
+
     cout << "<h3>Map Analysis</h3>" << endl;
     cout << "<h3>File data</h3>" << endl;
+    cout << "<p>The following table is a hex dump of the entire file. Please note that the first "
+         << "64 bytes (4 rows) of the file are not part of the file itself. They are <em>supposed</em> "
+         << "to be a copy of the directory entry for the file, but appear, simply, unused.</p>" << endl;
+
+    cout << getHexDumpTable(fileId) << endl;
 
     cout << "<hr>" << endl << endl;
 }
+
+string QXDQxlWin::getHexDumpTable(uint16_t blockId)
+{
+    // Dump out a hex listing of a file as a table.
+    stringstream s;
+    s << "<table style=\"width:70%\">" << endl
+      << "<tr><th class=\"middle\" style=\"width:10%\">Offset</th>"
+      << "<th class=\"middle\" style=\"width:45%\">Hex Codes</th>"
+      << "<th class=\"middle\" style=\"width:15%\">ASCII Codes</th></tr>"
+      << endl;
+
+      uint16_t nextBlock = blockId;
+      uint32_t ignore;
+
+      do {
+            s << getHexDumpRows(nextBlock);
+            getMapBlockData(nextBlock, nextBlock, ignore);
+      } while (nextBlock);
+
+      s << "</table>" << endl;
+
+    return s.str();
+}
+
+
+string QXDQxlWin::getHexDumpRows(uint16_t blockId)
+{
+    // Return one block's worth of file as a 16 byte
+    // per row table. As many rows as required are returned.
+    uint32_t fileOffset = 0;
+    uint16_t nextBlock;
+    stringstream s;
+    string ascii;
+    uint8_t sector[512];
+
+    // Convert the blockID to a file offset.
+    nextBlock = blockId;
+    fileOffset = nextBlock * Header.qwa_sctg * 512;
+
+    // I suppose we better read the file?
+    mIfs->seekg(fileOffset);
+    mIfs->read((char *)&sector[0], 512);
+
+    // 16 bytes per row = 16 rows.
+    const uint16_t numRows = 16;
+    for (uint16_t x=0; x < 512/numRows; x++) {
+        // Do the offset.
+        s << "<tr><td class=\"middle\">$"
+          << setbase(16) << setw(8) << setfill('0') << fileOffset + (x * numRows)
+          << setfill(' ') << setw(0) << "</td><td class=\"middle\">";
+
+        // Do 16 bytes per row.
+        uint16_t byteOffset = (x * 16);
+        ascii.clear();
+
+        for (uint16_t byte = 0; byte < 16; byte++) {
+            uint8_t c = sector[byteOffset + byte];
+
+            s << setw(2) << setfill('0') << (c & 0xff)
+              << setw(0) << setfill(' ') << ' ';
+
+            if (isprint(c)) {
+                ascii.push_back(sector[byteOffset + byte]);
+            } else {
+                ascii.push_back('.');
+            }
+        }
+        s << "</td><td class=\"middle\">" << ascii << "</td></tr>" << endl;
+    }
+
+    return s.str();
+}
+

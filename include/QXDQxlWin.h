@@ -66,6 +66,8 @@ class QXDQxlWin
         bool getMapBlockData(const uint16_t blockId, uint16_t &nextBlock, uint32_t &blockFileAddress);
         string getBlockChain(const uint16_t blockId);
         string getBlockChainTable(const uint16_t blockId);
+        string getHexDumpTable(uint16_t blockId);
+        string getHexDumpRows(uint16_t blockId);
         void displayData(uint16_t &offset, const uint16_t width, const uint32_t value, const string name, const string description);
         void displayOffset(uint16_t &offset, const uint16_t width, const string name);
         uint8_t getByte();

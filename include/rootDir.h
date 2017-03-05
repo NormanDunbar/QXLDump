@@ -31,12 +31,12 @@ typedef struct rootDir {
     uint8_t  hdr_type;              // File type.
     uint32_t hdr_data;              // File dataspace. EXECable files only.
     uint32_t hdr_xtra;              // Extra Information.
-    uint32_t hdr_name_size;         // Size of filename.
+    uint16_t hdr_name_size;         // Size of filename.
     char     hdr_name[36];          // File name. Up to 36 bytes.
     uint32_t hdr_date;              // File update date.
     uint16_t hdr_vers;              // File version number.
     uint16_t hdr_flid;              // File ID. Used in the map. Zero = deleted.
-    uint32_t hdt_bkup;              // File backup date.
+    uint32_t hdr_bkup;              // File backup date.
 } rootDir;
 
 #endif // ROOTDIR_H

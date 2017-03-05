@@ -58,6 +58,7 @@ int main(int argc, char *argv[])
           options.QXDmap() ||
           options.QXDData() ||
           options.QXDFile() ||
+          options.QXDDirectory() ||
           options.QXDRoot() ||
           options.QXDFree()))
     {
@@ -103,6 +104,11 @@ int main(int argc, char *argv[])
     // --File requested?
     if (options.QXDFile()) {
         qxl->doFile(options.QXDFileId());
+    }
+
+    // --File requested?
+    if (options.QXDDirectory()) {
+        qxl->doDirectory(options.QXDDirId());
     }
 
 

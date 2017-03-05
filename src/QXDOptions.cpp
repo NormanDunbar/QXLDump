@@ -35,7 +35,9 @@ QXDOptions::QXDOptions()
     mData = false;
     mFree = false;
     mFile = false;
+    mDirectory=false;
     mFileId = 0;
+    mDirId = 0;
     mQXLFile = "";
 }
 
@@ -65,8 +67,7 @@ bool QXDOptions::parseArgs(int argc, char *argv[]) {
         }
 
         // Try ALL ...
-        if ((thisArg == "--all") ||
-            (thisArg == "-a")) {
+        if (thisArg == "--all") {
             mHeader = true;
             mMap = true;
             mData = true;
@@ -76,43 +77,37 @@ bool QXDOptions::parseArgs(int argc, char *argv[]) {
         }
 
         // Try HEADER ...
-        if ((thisArg == "--header") ||
-            (thisArg == "-h")) {
+        if (thisArg == "--header") {
             mHeader = true;
             continue;
         }
 
         // Try MAP ...
-        if ((thisArg == "--map") ||
-            (thisArg == "-m")) {
+        if (thisArg == "--map") {
             mMap = true;
             continue;
         }
 
         // Try ROOT ...
-        if ((thisArg == "--root") ||
-            (thisArg == "-r")) {
+        if (thisArg == "--root") {
             mRoot = true;
             continue;
         }
 
         // Try DATA ...
-        if ((thisArg == "--data") ||
-            (thisArg == "-d")) {
+        if (thisArg == "--data") {
             mData = true;
             continue;
         }
 
         // Try FREE ...
-        if ((thisArg == "--free") ||
-            (thisArg == "-e")) {
+        if (thisArg == "--free") {
             mData = true;
             continue;
         }
 
         // Try FILE=n ...
-        if ((thisArg.substr(0, 6) == "--file") ||
-            (thisArg.substr(0, 2) == "-f")) {
+        if (thisArg.substr(0, 6) == "--file") {
             bool fileOK = true;
             unsigned temp = getDigits(thisArg, 7, &fileOK);
             if (fileOK) {
@@ -123,13 +118,13 @@ bool QXDOptions::parseArgs(int argc, char *argv[]) {
             continue;
         }
 
-        // Try F=n ...
-        if (thisArg.substr(0, 2) == "-f") {
-            bool fileOK = true;
-            unsigned temp = getDigits(thisArg, 3, &fileOK);
-            if (fileOK) {
-                mFileId = temp;
-                mFile = true;
+        // Try DIR=n ...
+        if (thisArg.substr(0, 5) == "--dir") {
+            bool dirOK = true;
+            unsigned temp = getDigits(thisArg, 6, &dirOK);
+            if (dirOK) {
+                mDirId = temp;
+                mDirectory = true;
             }
 
             continue;
@@ -224,14 +219,15 @@ void QXDOptions::usage() {
     cerr << "'QXLWIN_file' is the file name of the qxl.win file to be dumped." << endl << endl;
 
     cerr << "OPTIONS:" << endl << endl;
-    cerr << "'-?' or '--help' Displays this help, and exits." << endl;
-    cerr << "'-h' or '--header' Displays the file header." << endl;
-    cerr << "'-m' or '--map' Displays the file map." << endl;
-    cerr << "'-r' or '--root' Displays the root directory." << endl;
-    cerr << "'-d' or '--data' Displays the file's (used) data." << endl;
-    cerr << "'-e' or '--free' Displays the file's free space." << endl;
-    cerr << "'-a' or '--all' Sets '--header', '--map', '--root', '--data' amd '--free'." << endl;
-    cerr << "'-f=n' or '--file=n' Displays the file with FileId 'n'." << endl << endl;
+    cerr << "'--help' Displays this help, and exits." << endl;
+    cerr << "'--header' Displays the file header." << endl;
+    cerr << "'--map' Displays the file map." << endl;
+    cerr << "'--root' Displays the root directory." << endl;
+    cerr << "'--data' Displays the file's (used) data." << endl;
+    cerr << "'--free' Displays the file's free space." << endl;
+    cerr << "'--all' Sets '--header', '--map', '--root', '--data' amd '--free'." << endl;
+    cerr << "'--dir=n' Displays the directory with FileId 'n'." << endl;
+    cerr << "'--file=n' Displays the file with FileId 'n'." << endl << endl;
 
     cerr << "OUTPUT:" << endl << endl;
     cerr << "Output is written to 'stdout' and so, can be easily redirected to a file." << endl;

@@ -64,9 +64,13 @@ class QXDOptions
 
         // Are we dumping a single file or directory?
         bool QXDFile() { return mFile; }
+        bool QXDDirectory() { return mDirectory; }
 
         // Which file are we dumping?
         uint16_t QXDFileId() { return mFileId; }
+
+        // Which directory are we dumping?
+        uint16_t QXDDirId() { return mDirId; }
 
         // What is the name of the QXL.WIN file?
         string QXDQxlFile() { return mQXLFile; }
@@ -93,7 +97,9 @@ class QXDOptions
         bool mData;
         bool mFree;
         bool mFile;
+        bool mDirectory;
         uint16_t mFileId = 0;
+        uint16_t mDirId = 0;
 
         uint32_t getDigits(const string &lookHere, const unsigned pos, bool *ok);
         bool fileExists(const string &fullPath);

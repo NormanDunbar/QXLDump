@@ -25,6 +25,8 @@
 #include <sstream>
 #include <cctype>
 
+#include "Thousands.h"
+
 using std::stringstream;
 using std::isprint;
 
@@ -509,6 +511,13 @@ void QXDQxlWin::doRoot()
 
     cout << getHexDumpTable(rootBlock) << endl;
 
+    // Show the directory as a table of entries.
+    cout << "<h3>Root Directory</h3>" << endl;
+    cout << "The following table shows the entries in the root directory. Unused entries, such as for "
+         << "deleted files, are not listed here. You can see those in the raw data above.</p>" << endl;
+
+    cout << getDirectoryTable(rootBlock) << endl;
+
     cout << "<hr>" << endl << endl;
 
 }
@@ -569,32 +578,73 @@ void QXDQxlWin::doFile(uint16_t fileId)
     cout << "<h3>File data</h3>" << endl;
     cout << "<p>The following table is a hex dump of the entire file. Please note that the first "
          << "64 bytes (4 rows) of the file are not part of the file itself. They are <em>supposed</em> "
-         << "to be a copy of the directory entry for the file, but appear, simply, unused.</p>" << endl;
+         << "to be a copy of the directory entry for the file, but appear, simply, unused.</p>" << endl
+         << "<p>Note also that the <em>all</em> "
+         << Header.qwa_sctg << " sectors (" << Header.qwa_sctg * 512
+         << " bytes) making up the file will be dumped. This "
+         << "may show some random data after the official end of file.</p>" << endl;
 
     cout << getHexDumpTable(fileId) << endl;
 
     cout << "<hr>" << endl << endl;
 }
 
+void QXDQxlWin::doDirectory(uint16_t blockId)
+{
+    // Dump out the requested directory.
+    cout << "<h2>Directory</h2>" << endl;
+    cout << "<h3>Map Location Data</h3>" << endl;
+
+    cout << "<p>The following table shows the locations, in the map, of the blocks used for the requested directory.</p>"
+         << endl;
+
+    // Show the chain of map blocks for the root directory.
+    uint16_t dirBlock = blockId;
+    cout << getBlockChainTable(dirBlock);
+
+    // Show the entire root directory, as a hex dump.
+    cout << "<h3>Directory Sectors</h3>" << endl;
+    cout << "<p>The following table is a hex dump of the entire directory. Please note that the first "
+         << "64 bytes (4 rows) of the dump are not part of the directory itself. They are <em>supposed</em> "
+         << "to be a copy of the directory entry for the file, but appear, simply, unused.</p>" << endl;
+
+    cout << getHexDumpTable(dirBlock) << endl;
+
+    // Show the directory as a table of entries.
+    cout << "<h3>Directory</h3>" << endl;
+    cout << "The following table shows the entries in the directory. Unused entries, such as for "
+         << "deleted files, are not listed here. You can see those in the raw data above.</p>" << endl;
+
+    cout << getDirectoryTable(dirBlock) << endl;
+
+    cout << "<hr>" << endl << endl;
+
+}
+
 string QXDQxlWin::getHexDumpTable(uint16_t blockId)
 {
     // Dump out a hex listing of a file as a table.
     stringstream s;
-    s << "<table style=\"width:70%\">" << endl
-      << "<tr><th class=\"middle\" style=\"width:10%\">Offset</th>"
-      << "<th class=\"middle\" style=\"width:45%\">Hex Codes</th>"
-      << "<th class=\"middle\" style=\"width:15%\">ASCII Codes</th></tr>"
-      << endl;
 
-      uint16_t nextBlock = blockId;
-      uint32_t ignore;
+    uint16_t nextBlock = blockId;
+    uint32_t ignore;
 
-      do {
-            s << getHexDumpRows(nextBlock);
-            getMapBlockData(nextBlock, nextBlock, ignore);
-      } while (nextBlock);
+    do {
+        s << "<p><Strong>Block: $</strong>"
+          << setbase(16) << setw(4) << setfill('0') << nextBlock
+          << " (" << setbase(10) << setw(0) << setfill(' ') << nextBlock
+          << ")</p>" << endl
+          << "<table style=\"width:70%\">" << endl
+          << "<tr><th class=\"middle\" style=\"width:10%\">Offset</th>"
+          << "<th class=\"middle\" style=\"width:45%\">Hex Codes</th>"
+          << "<th class=\"middle\" style=\"width:15%\">ASCII Codes</th></tr>"
+          << endl;
 
-      s << "</table>" << endl;
+        s << getHexDumpRows(nextBlock)
+          << "</table>" << endl;
+
+        getMapBlockData(nextBlock, nextBlock, ignore);
+    } while (nextBlock);
 
     return s.str();
 }
@@ -608,7 +658,9 @@ string QXDQxlWin::getHexDumpRows(uint16_t blockId)
     uint16_t nextBlock;
     stringstream s;
     string ascii;
-    uint8_t sector[512];
+
+    // Each block is a given number of sectors.
+    uint8_t sector[512 * Header.qwa_sctg];
 
     // Convert the blockID to a file offset.
     nextBlock = blockId;
@@ -616,11 +668,11 @@ string QXDQxlWin::getHexDumpRows(uint16_t blockId)
 
     // I suppose we better read the file?
     mIfs->seekg(fileOffset);
-    mIfs->read((char *)&sector[0], 512);
+    mIfs->read((char *)&sector[0], 512 * Header.qwa_sctg);
 
-    // 16 bytes per row = 16 rows.
+    // 16 bytes per row = 16 rows per sector.
     const uint16_t numRows = 16;
-    for (uint16_t x=0; x < 512/numRows; x++) {
+    for (uint16_t x=0; x < (512 * Header.qwa_sctg)/numRows; x++) {
         // Do the offset.
         s << "<tr><td class=\"middle\">$"
           << setbase(16) << setw(8) << setfill('0') << fileOffset + (x * numRows)
@@ -648,3 +700,148 @@ string QXDQxlWin::getHexDumpRows(uint16_t blockId)
     return s.str();
 }
 
+
+string QXDQxlWin::getDirectoryTable(uint16_t blockId)
+{
+    // Dump out a directory listing as a table.
+    stringstream s;
+    uint16_t nextBlock = blockId;
+    uint32_t ignore;
+
+    do {
+        s << "<p><Strong>Block: $</strong>"
+          << setbase(16) << setw(4) << setfill('0') << nextBlock
+          << " (" << setbase(10) << setw(0) << setfill(' ') << nextBlock
+          << ")</p>" << endl;
+
+        s << "<table style=\"width:95%\">" << endl << "<tr>"
+          << "<th class=\"middle\" style=\"width:10%\">File Length</th>"
+          << "<th class=\"middle\" style=\"width:5%\">Access</th>"
+          << "<th class=\"middle\" style=\"width:5%\">Type</th>"
+          << "<th class=\"middle\" style=\"width:10%\">Dataspace</th>"
+          << "<th class=\"middle\" style=\"width:10%\">Extra</th>"
+          << "<th class=\"middle\" style=\"width:20%\">File Name</th>"
+          << "<th class=\"middle\" style=\"width:10%\">Update Date</th>"
+          << "<th class=\"middle\" style=\"width:5%\">Version</th>"
+          << "<th class=\"middle\" style=\"width:5%\">File Id</th>"
+          << "<th class=\"middle\" style=\"width:10%\">Backup date</th>"
+          << "</tr>" << endl;
+
+        s << getDirectoryRows(nextBlock)
+          << "</table>" << endl;
+
+        getMapBlockData(nextBlock, nextBlock, ignore);
+    } while (nextBlock);
+
+    return s.str();
+}
+
+string QXDQxlWin::getDirectoryRows(uint16_t blockId)
+{
+    // Returns rows of data for a directory block.
+    // As many rows as required are returned.
+    uint32_t fileOffset = 0;
+    uint16_t nextBlock;
+    stringstream s;
+
+    // Make sure that S gets comma/dot separated thousands etc.
+    s.imbue(locale(s.getloc(), new ThousandsSeparator<char>(',')));
+
+    // 512 bytes per sector, 64 bytes per directory entry,
+    // file defined number of sectors per block.
+    const uint16_t numRows = (512 * Header.qwa_sctg)/64;
+    rootDir directory[numRows];
+
+    // Convert the blockID to a file offset.
+    nextBlock = blockId;
+    fileOffset = nextBlock * Header.qwa_sctg * 512;
+
+    // I suppose we better read the file?
+    // Bit by bloody bit because endian-ness! Sigh.
+    mIfs->seekg(fileOffset);
+    for (uint16_t x=0; x < numRows; x++) {
+        directory[x].hdr_flen = getLong();
+        directory[x].hdr_accs = getByte();
+        directory[x].hdr_type = getByte();
+        directory[x].hdr_data = getLong();
+        directory[x].hdr_xtra = getLong();
+        directory[x].hdr_name_size = getWord();
+        mIfs->read(directory[x].hdr_name, 36);
+        directory[x].hdr_date = getLong();
+        directory[x].hdr_vers = getWord();
+        directory[x].hdr_flid = getWord();
+        directory[x].hdr_bkup = getLong();
+    }
+
+    for (uint16_t x=0; x < numRows; x++) {
+
+        cerr << "GetDirectoryRows(" << blockId << "), entry: " << x << endl
+             << "Offset: " << setbase(16) << setw(8) << setfill('0') << fileOffset + (x * 64)
+             << setbase(10) << setw(0) << setfill(' ') << endl;
+
+        // Don't do deleted entries.
+        if (!directory[x].hdr_flen &&
+            !directory[x].hdr_flid) {
+            continue;
+        }
+
+        // Do the file length.
+        s << setbase(10) << setfill(' ') << setw(0)
+          << "<tr>"
+          << "<td class=\"right\">"
+          << directory[x].hdr_flen
+          << "</td>";
+
+        // Do the Access byte.
+        s << "<td class=\"right\">"
+          << (directory[x].hdr_accs & 0xff)
+          << "</td>";
+
+        // Do the File type.
+        s << "<td class=\"right\">"
+          << (directory[x].hdr_type & 0xff)
+          << "</td>";
+
+        // Do the File data space. EXECable files only.
+        s << "<td class=\"right\">"
+          << directory[x].hdr_data
+          << "</td>";
+
+        // Do the Extra Information.
+        s << "<td class=\"right\">$"
+          << setbase(16) << setw(8) << setfill('0') << directory[x].hdr_xtra
+          << setbase(10) << setfill(' ') << setw(0) << "</td>";
+
+        // Do the File name. Up to 36 bytes.
+        s << "<td class=\"left\">";
+        for (uint16_t y = 0; y < directory[x].hdr_name_size; y++) {
+            s << directory[x].hdr_name[y];
+        }
+        s << "</td>";
+
+        // Do the File update date.
+        s << "<td class=\"right\">$"
+          << setbase(16) << setw(8) << setfill('0') << directory[x].hdr_flen
+          << setbase(10) << setfill(' ') << setw(0) << "</td>";
+
+        // Do the File version number.
+        s << "<td class=\"right\">"
+          << directory[x].hdr_vers
+          << "</td>";
+
+        // Do the File ID. Used in the map. Zero = deleted.
+        s << "<td class=\"right\">"
+          << directory[x].hdr_flid
+          << "</td>";
+
+        // Do the Backup Date.
+        s << "<td class=\"right\">$"
+          << setbase(16) << setw(8) << setfill('0') << directory[x].hdr_flen
+          << setbase(10) << setfill(' ') << setw(0) << "</td>";
+
+        s << "</tr>" << endl;
+    }
+
+    cerr << s.str();
+    return s.str();
+}

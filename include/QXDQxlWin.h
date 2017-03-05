@@ -54,6 +54,7 @@ class QXDQxlWin
         void doData();
         void doFree();
         void doFile(uint16_t fileId);
+        void doDirectory(uint16_t fileId);
 
     protected:
 
@@ -68,6 +69,8 @@ class QXDQxlWin
         string getBlockChainTable(const uint16_t blockId);
         string getHexDumpTable(uint16_t blockId);
         string getHexDumpRows(uint16_t blockId);
+        string getDirectoryTable(uint16_t blockId);
+        string getDirectoryRows(uint16_t blockId);
         void displayData(uint16_t &offset, const uint16_t width, const uint32_t value, const string name, const string description);
         void displayOffset(uint16_t &offset, const uint16_t width, const string name);
         uint8_t getByte();

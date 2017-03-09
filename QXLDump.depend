@@ -1,13 +1,13 @@
 # depslib dependency file v1.0
-1488647706 source:c:\sourcecode\qxldump\src\qxdoptions.cpp
+1489062025 source:c:\sourcecode\qxldump\src\qxdoptions.cpp
 	"QXDOptions.h"
 
-1488646806 c:\sourcecode\qxldump\include\qxdoptions.h
+1489061983 c:\sourcecode\qxldump\include\qxdoptions.h
 	<string>
 	<iostream>
 	<fstream>
 
-1488646418 source:c:\sourcecode\qxldump\src\qxdqxlwin.cpp
+1489062311 source:c:\sourcecode\qxldump\src\qxdqxlwin.cpp
 	<sstream>
 	<cctype>
 	"Thousands.h"
@@ -15,7 +15,7 @@
 	"css.h"
 	"rootDir.h"
 
-1488646418 c:\sourcecode\qxldump\include\qxdqxlwin.h
+1489062688 c:\sourcecode\qxldump\include\qxdqxlwin.h
 	<iostream>
 	<iomanip>
 	<fstream>
@@ -23,7 +23,7 @@
 	"QXDOptions.h"
 	"QXLHeader.h"
 
-1488647930 source:c:\sourcecode\qxldump\src\qxldump.cpp
+1489062074 source:c:\sourcecode\qxldump\src\qxldump.cpp
 	"QXLDump.h"
 	"QXDOptions.h"
 	"QXDQxlWin.h"

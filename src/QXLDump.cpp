@@ -53,10 +53,10 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    // Did we get any options? Default to --header if not.
+    // Did we get any options? Default to --header and --root if not.
     if (!(options.QXDheader() ||
           options.QXDmap() ||
-          options.QXDData() ||
+          options.QXDDataBlock() ||
           options.QXDFile() ||
           options.QXDDirectory() ||
           options.QXDRoot() ||
@@ -91,11 +91,6 @@ int main(int argc, char *argv[])
         qxl->doRoot();
     }
 
-    // --Data requested?
-    if (options.QXDData()) {
-        qxl->doData();
-    }
-
     // --Free requested?
     if (options.QXDFree()) {
         qxl->doFree();
@@ -106,11 +101,16 @@ int main(int argc, char *argv[])
         qxl->doFile(options.QXDFileId());
     }
 
-    // --File requested?
+    // --Directory requested?
     if (options.QXDDirectory()) {
         qxl->doDirectory(options.QXDDirId());
     }
 
+
+    // --Data requested?
+    if (options.QXDDataBlock()) {
+        qxl->doData(options.QXDBlockId());
+    }
 
     return allOk ? 0 : 1;
 }

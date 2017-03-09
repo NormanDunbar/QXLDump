@@ -30,15 +30,9 @@
 using std::stringstream;
 using std::isprint;
 
-
 #include "QXDQxlWin.h"
 #include "css.h"
 #include "rootDir.h"
-
-// A constant to be used to set a bit to indicate that this
-// particular map block is NOT the first in a file.
-const uint32_t blockinFile = (1 << 16);
-const uint32_t blockFree = (1 << 17);
 
 QXDQxlWin::QXDQxlWin(QXDOptions *opt)
 {
@@ -287,9 +281,7 @@ void QXDQxlWin::readMap()
     // Used + free.
     uint16_t maxBlocks = Header.qwa_ngrp;
 
-    // We are using 32 bit wide entries as we use the top
-    // word for some flags.
-    mQXLMap = new uint32_t[maxBlocks];
+    mQXLMap = new uint16_t[maxBlocks];
 
     mIfs->seekg(0x40);      // Start of map in file.
 
@@ -499,35 +491,48 @@ void QXDQxlWin::doRoot()
          << setbase(16) << setw(4) << setfill('0') << Header.qwa_root << setbase(10) << setw(0) << setfill(' ')
          << ".</p>" << endl;
 
-    // Show the chain of map blocks for the root directory.
     uint16_t rootBlock = Header.qwa_root;
-    cout << getBlockChainTable(rootBlock);
 
-    // Show the entire root directory, as a hex dump.
-    cout << "<h3>Root Sectors</h3>" << endl;
-    cout << "<p>The following table is a hex dump of the entire directory. Please note that the first "
-         << "64 bytes (4 rows) of the dump are not part of the directory itself. They are <em>supposed</em> "
-         << "to be a copy of the directory entry for the file, but appear, simply, unused.</p>" << endl;
+    if (mOptions->QXDVerbose()) {
+        // Show the chain of map blocks for the root directory.
+        cout << getBlockChainTable(rootBlock);
 
-    cout << getHexDumpTable(rootBlock) << endl;
+        // Show the entire root directory, as a hex dump.
+        cout << "<h3>Root Sectors</h3>" << endl;
+        cout << "<p>The following table is a hex dump of the entire directory. Please note that the first "
+             << "64 bytes (4 rows) of the dump are not part of the directory itself. They are <em>supposed</em> "
+             << "to be a copy of the directory entry for the file, but appear, simply, unused.</p>" << endl;
+
+        cout << getHexDumpTable(rootBlock) << endl;
+    }
 
     // Show the directory as a table of entries.
     cout << "<h3>Root Directory</h3>" << endl;
     cout << "The following table shows the entries in the root directory. Unused entries, such as for "
-         << "deleted files, are not listed here. You can see those in the raw data above.</p>" << endl;
+         << "deleted files, are not listed here. You can see those in the raw data above in '--verbose' mode.</p>" << endl;
 
-    cout << getDirectoryTable(rootBlock) << endl;
+    cout << getDirectoryTable(rootBlock, Header.qwa_rlen) << endl;
 
     cout << "<hr>" << endl << endl;
 
 }
 
-void QXDQxlWin::doData()
+void QXDQxlWin::doData(uint16_t blockId)
 {
-    // Dump out the entire data area.
-    cout << "<h2>Data Areas</h2>" << endl;
-    cout << "<h3>Map Location Data</h3>" << endl;
-    cout << "<h3>Map Analysis</h3>" << endl;
+    // Dump out a single data block.
+    cout << "<h2>Data Block</h2>" << endl;
+    cout << "<p>Note that when dumping a single data block that the first 64 bytes <em>may not</em> "
+         << "be part of the actual data in the block, if and only if, the block is the <em>first</em> block "
+         << "in the appropriate data file.</p>" << endl
+         << "<p>Similarly, if a block is the <em>final</em> one in a file or directory, then some of the "
+         << "displayed data below, may be random garbage left over from previous use of the sectors which "
+         << "make up the final block of a file or directory.</p>" << endl;
+
+    cout << "<h3>Block Data</h3>" << endl;
+    cout << "<p>The following table is a hex dump of data block " << blockId << "."
+         << endl;
+
+    cout << getHexDumpTable(blockId) << endl;
 
     cout << "<hr>" << endl << endl;
 }
@@ -574,49 +579,50 @@ void QXDQxlWin::doFile(uint16_t fileId)
     uint16_t nextBlock = fileId;
     cout << getBlockChainTable(nextBlock);
 
-    cout << "<h3>Map Analysis</h3>" << endl;
+    // We don't need --verbose mode to dump a file as there's nothing
+    // to show if we only dump out in verbose mode!
     cout << "<h3>File data</h3>" << endl;
-    cout << "<p>The following table is a hex dump of the entire file. Please note that the first "
-         << "64 bytes (4 rows) of the file are not part of the file itself. They are <em>supposed</em> "
+    cout << "<p>The following table is a hex dump of the entire file. Please note that the <strong>first "
+         << "64 bytes (4 rows)</strong> of the file are <strong>not part of the file</strong> itself. They are <em>supposed</em> "
          << "to be a copy of the directory entry for the file, but appear, simply, unused.</p>" << endl
-         << "<p>Note also that the <em>all</em> "
-         << Header.qwa_sctg << " sectors (" << Header.qwa_sctg * 512
-         << " bytes) making up the file will be dumped. This "
-         << "may show some random data after the official end of file.</p>" << endl;
+         << endl;
 
     cout << getHexDumpTable(fileId) << endl;
-
     cout << "<hr>" << endl << endl;
 }
 
 void QXDQxlWin::doDirectory(uint16_t blockId)
 {
     // Dump out the requested directory.
-    cout << "<h2>Directory</h2>" << endl;
-    cout << "<h3>Map Location Data</h3>" << endl;
 
-    cout << "<p>The following table shows the locations, in the map, of the blocks used for the requested directory.</p>"
-         << endl;
-
-    // Show the chain of map blocks for the root directory.
     uint16_t dirBlock = blockId;
-    cout << getBlockChainTable(dirBlock);
 
-    // Show the entire root directory, as a hex dump.
-    cout << "<h3>Directory Sectors</h3>" << endl;
-    cout << "<p>The following table is a hex dump of the entire directory. Please note that the first "
-         << "64 bytes (4 rows) of the dump are not part of the directory itself. They are <em>supposed</em> "
-         << "to be a copy of the directory entry for the file, but appear, simply, unused.</p>" << endl;
+    cout << "<h2>Directory Dump</h2>" << endl;
 
-    cout << getHexDumpTable(dirBlock) << endl;
+    if (mOptions->QXDVerbose()) {
+        // Show the chain of map blocks for the root directory.
+        cout << "<h3>Map Location Data</h3>" << endl;
+
+        cout << "<p>The following table shows the locations, in the map, of the blocks used for the requested directory.</p>"
+             << endl;
+
+        cout << getBlockChainTable(dirBlock);
+
+        // Show the entire root directory, as a hex dump.
+        cout << "<h3>Directory Sectors</h3>" << endl;
+        cout << "<p>The following table is a hex dump of the entire directory. Please note that the first "
+             << "64 bytes (4 rows) of the dump are not part of the directory itself. They are <em>supposed</em> "
+             << "to be a copy of the directory entry for the file, but appear, simply, unused.</p>" << endl;
+
+        cout << getHexDumpTable(dirBlock) << endl;
+    }
 
     // Show the directory as a table of entries.
     cout << "<h3>Directory</h3>" << endl;
     cout << "The following table shows the entries in the directory. Unused entries, such as for "
-         << "deleted files, are not listed here. You can see those in the raw data above.</p>" << endl;
+         << "deleted files, are not listed here. You can see those in the raw data in '--verbose' mode.</p>" << endl;
 
-    cout << getDirectoryTable(dirBlock) << endl;
-
+    cout << getDirectoryTable(dirBlock, mOptions->QXDDirLength()) << endl;
     cout << "<hr>" << endl << endl;
 
 }
@@ -701,65 +707,90 @@ string QXDQxlWin::getHexDumpRows(uint16_t blockId)
 }
 
 
-string QXDQxlWin::getDirectoryTable(uint16_t blockId)
+string QXDQxlWin::getDirectoryTable(uint16_t blockId, const uint32_t dirLength)
 {
-    // Dump out a directory listing as a table.
+    // Dump out a directory listing as a table. However,
+    // we are only interested in the valid entries and not
+    // in any potential "crap" (technical term) after the
+    // official end of the directory.
+    // As each directory entry is a fixed 64 bytes,
+    // We therefore get 2048/64 entries in the first n blocks
+    // And file_size mod 64 in the last block.
+    // Easy!
     stringstream s;
-    uint16_t nextBlock = blockId;
+    uint16_t thisBlock = blockId;
+    uint16_t nextBlock;
     uint32_t ignore;
+    uint16_t numDirEntries;
+    uint16_t fullBlocksDone = 0;
+    bool firstBlock=true;
+
+    // Calculate the number of entries in a full block.
+    numDirEntries = (512 * Header.qwa_sctg) / 64;
 
     do {
         s << "<p><Strong>Block: $</strong>"
-          << setbase(16) << setw(4) << setfill('0') << nextBlock
-          << " (" << setbase(10) << setw(0) << setfill(' ') << nextBlock
+          << setbase(16) << setw(4) << setfill('0') << thisBlock
+          << " (" << setbase(10) << setw(0) << setfill(' ') << thisBlock
           << ")</p>" << endl;
 
         s << "<table style=\"width:95%\">" << endl << "<tr>"
-          << "<th class=\"middle\" style=\"width:10%\">File Length</th>"
-          << "<th class=\"middle\" style=\"width:5%\">Access</th>"
-          << "<th class=\"middle\" style=\"width:5%\">Type</th>"
-          << "<th class=\"middle\" style=\"width:10%\">Dataspace</th>"
-          << "<th class=\"middle\" style=\"width:10%\">Extra</th>"
-          << "<th class=\"middle\" style=\"width:20%\">File Name</th>"
-          << "<th class=\"middle\" style=\"width:10%\">Update Date</th>"
-          << "<th class=\"middle\" style=\"width:5%\">Version</th>"
-          << "<th class=\"middle\" style=\"width:5%\">File Id</th>"
-          << "<th class=\"middle\" style=\"width:10%\">Backup date</th>"
+          << "<th class=\"middle\" style=\"width:10%\">File<br>Length</th>"
+          << "<th class=\"middle\" style=\"width:5%\">Acc<br>-ess</th>"
+          << "<th class=\"middle\" style=\"width:5%\">File<br>Type</th>"
+          << "<th class=\"middle\" style=\"width:10%\">Data<br>Space</th>"
+          << "<th class=\"middle\" style=\"width:10%\">File<br>Extra</th>"
+          << "<th class=\"middle\" style=\"width:10%\">Name<br>Size</th>"
+          << "<th class=\"middle\" style=\"width:20%\">File<br>Name</th>"
+          << "<th class=\"middle\" style=\"width:10%\">Update<br>Date</th>"
+          << "<th class=\"middle\" style=\"width:5%\">Vers<br>-ion</th>"
+          << "<th class=\"middle\" style=\"width:5%\">File<br>Id</th>"
+          << "<th class=\"middle\" style=\"width:10%\">Backup<br>date</th>"
           << "</tr>" << endl;
 
-        s << getDirectoryRows(nextBlock)
+        // Get the following block number, in case we are done.
+        getMapBlockData(thisBlock, nextBlock, ignore);
+
+        // Are we on a full block of 2048/64 entries?
+        // Or on the last one, which may be smaller?
+        if (!nextBlock) {
+            // Last block, possibly short.
+            numDirEntries = (dirLength / 64) - (fullBlocksDone * numDirEntries);
+        }
+
+        s << getDirectoryRows(thisBlock, numDirEntries, firstBlock)
           << "</table>" << endl;
 
-        getMapBlockData(nextBlock, nextBlock, ignore);
-    } while (nextBlock);
+        // Process the correct block!
+        thisBlock = nextBlock;
+        fullBlocksDone++;
+        firstBlock = false;
+
+    } while (thisBlock);
 
     return s.str();
 }
 
-string QXDQxlWin::getDirectoryRows(uint16_t blockId)
+string QXDQxlWin::getDirectoryRows(uint16_t blockId, uint16_t numDirEntries, const bool firstBlock)
 {
     // Returns rows of data for a directory block.
     // As many rows as required are returned.
     uint32_t fileOffset = 0;
-    uint16_t nextBlock;
+    uint16_t thisBlock = blockId;
     stringstream s;
 
     // Make sure that S gets comma/dot separated thousands etc.
     s.imbue(locale(s.getloc(), new ThousandsSeparator<char>(',')));
 
-    // 512 bytes per sector, 64 bytes per directory entry,
-    // file defined number of sectors per block.
-    const uint16_t numRows = (512 * Header.qwa_sctg)/64;
-    rootDir directory[numRows];
+    rootDir directory[numDirEntries];
 
     // Convert the blockID to a file offset.
-    nextBlock = blockId;
-    fileOffset = nextBlock * Header.qwa_sctg * 512;
+    fileOffset = thisBlock * Header.qwa_sctg * 512;
 
     // I suppose we better read the file?
     // Bit by bloody bit because endian-ness! Sigh.
     mIfs->seekg(fileOffset);
-    for (uint16_t x=0; x < numRows; x++) {
+    for (uint16_t x=0; x < numDirEntries; x++) {
         directory[x].hdr_flen = getLong();
         directory[x].hdr_accs = getByte();
         directory[x].hdr_type = getByte();
@@ -773,15 +804,19 @@ string QXDQxlWin::getDirectoryRows(uint16_t blockId)
         directory[x].hdr_bkup = getLong();
     }
 
-    for (uint16_t x=0; x < numRows; x++) {
+    // The first entry in the first block of a directory is
+    // always empty, scrap, unused, etc.
+    uint16_t startEntry = 0;
+    if (firstBlock) {
+        startEntry++;
+    }
 
-        cerr << "GetDirectoryRows(" << blockId << "), entry: " << x << endl
-             << "Offset: " << setbase(16) << setw(8) << setfill('0') << fileOffset + (x * 64)
-             << setbase(10) << setw(0) << setfill(' ') << endl;
+    for (uint16_t x=startEntry; x < numDirEntries; x++) {
 
         // Don't do deleted entries.
-        if (!directory[x].hdr_flen &&
-            !directory[x].hdr_flid) {
+        if ((!directory[x].hdr_flen &&
+             !directory[x].hdr_flid) ||
+            (!directory[x].hdr_name_size)) {
             continue;
         }
 
@@ -811,6 +846,11 @@ string QXDQxlWin::getDirectoryRows(uint16_t blockId)
         s << "<td class=\"right\">$"
           << setbase(16) << setw(8) << setfill('0') << directory[x].hdr_xtra
           << setbase(10) << setfill(' ') << setw(0) << "</td>";
+
+        // Do the Name Size.
+        s << "<td class=\"right\">"
+          << directory[x].hdr_name_size
+          << "</td>";
 
         // Do the File name. Up to 36 bytes.
         s << "<td class=\"left\">";
@@ -842,6 +882,5 @@ string QXDQxlWin::getDirectoryRows(uint16_t blockId)
         s << "</tr>" << endl;
     }
 
-    cerr << s.str();
     return s.str();
 }

@@ -32,12 +32,16 @@ QXDOptions::QXDOptions()
     mHeader = false;
     mMap = false;
     mRoot = false;
-    mData = false;
+    mDataBlock = false;
     mFree = false;
     mFile = false;
     mDirectory=false;
     mFileId = 0;
     mDirId = 0;
+    mBlockId = 0;
+    mDirLength = 0;
+    mSizeOk = false;
+    mVerbose = false;
     mQXLFile = "";
 }
 
@@ -70,7 +74,6 @@ bool QXDOptions::parseArgs(int argc, char *argv[]) {
         if (thisArg == "--all") {
             mHeader = true;
             mMap = true;
-            mData = true;
             mRoot = true;
             mFree = true;
             continue;
@@ -94,15 +97,21 @@ bool QXDOptions::parseArgs(int argc, char *argv[]) {
             continue;
         }
 
-        // Try DATA ...
-        if (thisArg == "--data") {
-            mData = true;
+        // Try BLOCK=n ...
+        if (thisArg.substr(0, 7) == "--block") {
+            bool fileOK = true;
+            unsigned temp = getDigits(thisArg, 8, &fileOK);
+            if (fileOK) {
+                mBlockId = temp;
+                mDataBlock = true;
+            }
+
             continue;
         }
 
         // Try FREE ...
         if (thisArg == "--free") {
-            mData = true;
+            mFree = true;
             continue;
         }
 
@@ -130,12 +139,36 @@ bool QXDOptions::parseArgs(int argc, char *argv[]) {
             continue;
         }
 
+        // Try SIZE=n ...
+        if (thisArg.substr(0, 6) == "--size") {
+            bool sizeOK = true;
+            unsigned temp = getDigits(thisArg, 7, &sizeOK);
+            if (sizeOK) {
+                mDirLength = temp;
+                mSizeOk = true;
+            }
+
+            // Directory sizes must be a multiple of 64 bytes.
+            if (mDirLength % 64) {
+                cerr << "QXLDump: Invalid directory size. Must be a multiple of 64." << endl;
+                invalidArgs = true;
+            }
+
+            continue;
+        }
+
         // Nope? Try help then ...
-        if ((thisArg == "--help") ||
-            (thisArg == "-?")) {
+        if (thisArg == "--help") {
             mHelp = true;
             continue;
         }
+
+        //Try VERBOSE ...
+        if (thisArg == "--verbose") {
+            mVerbose = true;
+            continue;
+        }
+
 
         // Either a filename or an error.
         // Try for an error ...
@@ -164,6 +197,12 @@ bool QXDOptions::parseArgs(int argc, char *argv[]) {
         }
 
     }
+
+    // We must have a file size if we have a directory to dump.
+    if (mDirectory && (!mSizeOk)) {
+        cerr << "QXLDump: You must supply '--dir' and '--size' together." << endl;
+        invalidArgs = true;
+    };
 
     // Did we just want help?
     // Do it and bale out.
@@ -223,11 +262,12 @@ void QXDOptions::usage() {
     cerr << "'--header' Displays the file header." << endl;
     cerr << "'--map' Displays the file map." << endl;
     cerr << "'--root' Displays the root directory." << endl;
-    cerr << "'--data' Displays the file's (used) data." << endl;
+    cerr << "'--block=n' Displays a single data block." << endl;
     cerr << "'--free' Displays the file's free space." << endl;
     cerr << "'--all' Sets '--header', '--map', '--root', '--data' amd '--free'." << endl;
-    cerr << "'--dir=n' Displays the directory with FileId 'n'." << endl;
+    cerr << "'--dir=n --size=s' Displays the directory with FileId 'n', and file size of 's' bytes. Both are required" << endl;
     cerr << "'--file=n' Displays the file with FileId 'n'." << endl << endl;
+    cerr << "'--verbose' Displays lots more information, hex dumps etc. Best avoided!" << endl << endl;
 
     cerr << "OUTPUT:" << endl << endl;
     cerr << "Output is written to 'stdout' and so, can be easily redirected to a file." << endl;

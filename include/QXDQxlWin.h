@@ -51,7 +51,7 @@ class QXDQxlWin
         void doHeader();
         void doMap();
         void doRoot();
-        void doData();
+        void doData(uint16_t blockId);
         void doFree();
         void doFile(uint16_t fileId);
         void doDirectory(uint16_t fileId);
@@ -62,15 +62,15 @@ class QXDQxlWin
         QXDOptions *mOptions;
         ifstream *mIfs;
         QXLHeader Header;
-        uint32_t *mQXLMap;
+        uint16_t *mQXLMap;
         bool QXDOpenFile();
         bool getMapBlockData(const uint16_t blockId, uint16_t &nextBlock, uint32_t &blockFileAddress);
         string getBlockChain(const uint16_t blockId);
         string getBlockChainTable(const uint16_t blockId);
         string getHexDumpTable(uint16_t blockId);
         string getHexDumpRows(uint16_t blockId);
-        string getDirectoryTable(uint16_t blockId);
-        string getDirectoryRows(uint16_t blockId);
+        string getDirectoryTable(uint16_t blockId, const uint32_t dirLength);
+        string getDirectoryRows(uint16_t blockId, uint16_t numDirEntries, const bool firstBlock);
         void displayData(uint16_t &offset, const uint16_t width, const uint32_t value, const string name, const string description);
         void displayOffset(uint16_t &offset, const uint16_t width, const string name);
         uint8_t getByte();

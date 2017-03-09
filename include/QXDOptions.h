@@ -57,7 +57,7 @@ class QXDOptions
         bool QXDRoot() { return mRoot; }
 
         // Are we dumping the data blocks?
-        bool QXDData() { return mData; }
+        bool QXDDataBlock() { return mDataBlock; }
 
         // Are we dumping the free space?
         bool QXDFree() { return mFree; }
@@ -66,11 +66,18 @@ class QXDOptions
         bool QXDFile() { return mFile; }
         bool QXDDirectory() { return mDirectory; }
 
+        // Are we in verbose mode?
+        bool QXDVerbose() { return mVerbose; }
+
         // Which file are we dumping?
         uint16_t QXDFileId() { return mFileId; }
 
+        // Which block are we dumping?
+        uint16_t QXDBlockId() { return mBlockId; }
+
         // Which directory are we dumping?
         uint16_t QXDDirId() { return mDirId; }
+        uint32_t QXDDirLength() { return mDirLength; }
 
         // What is the name of the QXL.WIN file?
         string QXDQxlFile() { return mQXLFile; }
@@ -94,12 +101,16 @@ class QXDOptions
         bool mHeader;
         bool mMap;
         bool mRoot;
-        bool mData;
+        bool mDataBlock;
         bool mFree;
         bool mFile;
         bool mDirectory;
-        uint16_t mFileId = 0;
-        uint16_t mDirId = 0;
+        uint16_t mFileId;
+        uint16_t mDirId;
+        uint16_t mBlockId;
+        uint32_t mDirLength;
+        bool mSizeOk;
+        bool mVerbose;
 
         uint32_t getDigits(const string &lookHere, const unsigned pos, bool *ok);
         bool fileExists(const string &fullPath);

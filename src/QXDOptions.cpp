@@ -264,14 +264,14 @@ void QXDOptions::usage() {
     cerr << "'--root' Displays the root directory." << endl;
     cerr << "'--block=n' Displays a single data block." << endl;
     cerr << "'--free' Displays the file's free space." << endl;
-    cerr << "'--all' Sets '--header', '--map', '--root', '--data' amd '--free'." << endl;
-    cerr << "'--dir=n --size=s' Displays the directory with FileId 'n', and file size of 's' bytes. Both are required" << endl;
+    cerr << "'--all' Sets '--header', '--map', '--root' and '--free'." << endl;
+    cerr << "'--dir=n --size=s' Displays the directory with FileId 'n', and file size of 's' bytes. Both are required." << endl;
     cerr << "'--file=n' Displays the file with FileId 'n'." << endl << endl;
     cerr << "'--verbose' Displays lots more information, hex dumps etc. Best avoided!" << endl << endl;
 
     cerr << "OUTPUT:" << endl << endl;
     cerr << "Output is written to 'stdout' and so, can be easily redirected to a file." << endl;
-    cerr << "Errors etc are written to 'stderr' and won't interfere with the data on 'stdout'." << endl;
+    cerr << "Errors are written to 'stderr' and won't interfere with the data on 'stdout'." << endl;
 }
 
 

@@ -1,0 +1,84 @@
+<h1 id="qxldump">QXLDump</h1>
+<p>QXLDump is a small utility to dump out, in hex, the contents of a Sinclair QL formatted QXL.WIN file - in a meaningful context, not just a pile of hex numbers.</p>
+<p>The QXL.WIN format and many details of how it works can be found at <a href="http://qdosmsq.dunbar-it.co.uk/doku.php?id=qdosmsq:fs:qlwa" class="uri">http://qdosmsq.dunbar-it.co.uk/doku.php?id=qdosmsq:fs:qlwa</a>.</p>
+<p>The utility was developed in the Code-Blocks IDE using Embarcadero C++ version 10.1 (32 bit). Both of these are free. If you need to build the source then feel free to make changes, just remember to pass them back to me for others to use too. Thanks.</p>
+<p>If you have a different C++ compiler, then the following might work:</p>
+<pre><code>cd SourceCode\QXLDump
+CPP src\*.cpp -I include -o bin\release\QXLDump.exe</code></pre>
+<p>Where <code>CPP</code> is the command line version of your compiler.</p>
+<p>QXLDump is a utility I needed in order to assist me check changes to qxl.win files in a forthcoming mega utility! (I've been told a million times about exaggerating!) - I need to see changes within a qxl.win file as I do different things to it in an abusive manner!</p>
+<p>It is offered here as a potentially useful tool.</p>
+<p><strong>QXLDump will never open your qxl.win file in write mode. Only read.</strong> so your data are always safe with this utility.</p>
+<h1 id="using-qxldump.">Using QXLDump.</h1>
+<p>QXLDump always outputs its results to 'stdout' - aka the screen. This can be redirected to a file if desired. Output is in HTML format, and cannot be changed.</p>
+<pre><code>QXLDump c:\qxl.win --header &gt;qxl.win.html</code></pre>
+<p>The file <code>qxl.win.html</code> can now be opened in your favourite browser for inspection. Alternatively, you can use Internet Explorer!</p>
+<p>Error messages are written to <code>stderr</code> and these too can be redirected to a separate file in the normal manner. Error output is always in plain text format.</p>
+<pre><code>QXLDump c:\qxl.win --header &gt;qxl.win.html 2&gt;qxl.win.errors.txt</code></pre>
+<p>As above, the output can be viewed in your browser. Errors, in file <code>qxl.win.errors.txt</code> can be reviewed with any text editor.</p>
+<h2 id="command-line-options">Command line options:</h2>
+<p>If a qxl.win filename is passed, with no other parameters or options, then the equivalent of <code>--root</code> and <code>--header</code> is assumed. See below for details on these two options.</p>
+<h3 id="help">Help</h3>
+<p>The application help messages are displayed, and the application then exits. No processing is done.</p>
+<pre><code>QXLDump --help</code></pre>
+<p>The command will display the following:</p>
+<pre><code>QXLDump: version 0.01
+
+USAGE:
+
+QXLDump [options] QXLWIN_file
+
+&#39;QXLWIN_file&#39; is the file name of the qxl.win file to be dumped.
+
+OPTIONS:
+
+&#39;--help&#39; Displays this help, and exits.
+&#39;--header&#39; Displays the file header.
+&#39;--map&#39; Displays the file map.
+&#39;--root&#39; Displays the root directory.
+&#39;--block=n&#39; Displays a single data block.
+&#39;--free&#39; Displays the file&#39;s free space.
+&#39;--all&#39; Sets &#39;--header&#39;, &#39;--map&#39;, &#39;--root&#39; and &#39;--free&#39;.
+&#39;--dir=n --size=s&#39; Displays the directory with FileId &#39;n&#39;, and file size of &#39;s&#39; bytes. Both are required.
+&#39;--file=n&#39; Displays the file with FileId &#39;n&#39;.
+
+&#39;--verbose&#39; Displays lots more information, hex dumps etc. Best avoided!
+
+OUTPUT:
+
+Output is written to &#39;stdout&#39; and so, can be easily redirected to a file.
+Errors are written to &#39;stderr&#39; and won&#39;t interfere with the data on &#39;stdout&#39;.</code></pre>
+<h3 id="header">Header</h3>
+<p>The qxl.win file header is displayed. This is always the first 64 bytes of the file.</p>
+<pre><code>QXLDump c:\qxl.win --header</code></pre>
+<h3 id="map">Map</h3>
+<p>The list of blocks making up the entire qxl.win map area are dumped out. The map is used to determine where on disc data files and directories are located. The address of a block on disc is computed as the <code>blockId * sectors per block * 512</code>.</p>
+<pre><code>QXLDump c:\qxl.win --map</code></pre>
+<h3 id="root">Root</h3>
+<p>The root directory is dumped out in readable format. Only those entries which point to valid and existing (not deleted) files and other directories are listed. Deleted entries are not shown.</p>
+<p>If <code>--verbose</code> is specified, each block in the root directory is dumped out in hex and a list of all the blocks used by the root directory, in the map, are displayed.</p>
+<pre><code>QXLDump c:\qxl.win --root</code></pre>
+<p>or</p>
+<pre><code>QXLDump c:\qxl.win --root --verbose</code></pre>
+<h3 id="block">Block</h3>
+<p>A single block is dumped out in hex. The block number must be specified on the command line in decimal. <code>--verbose</code> has no effect here.</p>
+<pre><code>QXLDump c:\qxl.win --block=1234</code></pre>
+<h3 id="free">Free</h3>
+<p>The free space list is very similar to the map in that it dumps out the map blocks making up the free space chain. <code>--verbose</code> has no effect here.</p>
+<pre><code>QXLDump c:\qxl.win --free</code></pre>
+<h3 id="directory">Directory</h3>
+<p>A dump of the required directory blocks is carried out for the passed directory. The directory required must be specified by it's block number, not a name. <code>--verbose</code> will dump out the directory blocks in hex, if specified.</p>
+<p>The directory contents are displayed in a readable format.</p>
+<p>The size of the directory <em>must</em> be supplied. This is to stop the utility trying to read past the logical EOF and into the uncharted and shark infested waters of random garbage which can cause no end of trouble to an innocent dump utility! (Ask me how I know!)</p>
+<p>You obtain the directory id number and size from a listing of its parent directory, which could be the root.</p>
+<pre><code>QXLDump c:\qxl.win --directory=61 --size=1024</code></pre>
+<p>or</p>
+<pre><code>QXLDump c:\qxl.win --directory=61 --size=1024 --verbose</code></pre>
+<h3 id="file">File</h3>
+<p>A dump of the required file's blocks is carried out for the passed fine. The file required must be specified by it's block number, not a name. <code>--verbose</code> will dump out the file's data blocks in hex, if specified.</p>
+<p>You obtain the file id number from a listing of its parent directory, which could be the root.</p>
+<pre><code>QXLDump c:\qxl.win --file=27</code></pre>
+<h3 id="all">All</h3>
+<p>Using this option turns on <code>--header</code>, <code>--map</code>, <code>--root</code> and <code>--free</code>. Using <code>--verbose</code> will have the effect described for each individual option, as appropriate.</p>
+<h3 id="verbose">Verbose</h3>
+<p>This option modifies the output of the others. Normally it will cause a dump of the block numbers, from the map, that make up a directory or file's structure on disc. In addition, it will cause a hex dump of the blocks making up a file or directory, in addition to whatever the normal option outputs.</p>

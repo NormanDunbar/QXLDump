@@ -25,6 +25,10 @@
 #ifndef QXLHEADER_H
 #define QXLHEADER_H
 
+#if defined (__GNUC__)
+	#include <stdint.h>
+#endif
+
 const int QXLHeaderLength = 0x40;
 
 typedef struct QXLHeader {

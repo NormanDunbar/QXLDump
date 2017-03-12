@@ -29,6 +29,10 @@
 #include <iostream>
 #include <fstream>
 
+#if defined (__GNUC__)
+	#include <stdint.h>
+#endif
+
 using std::string;
 using std::cerr;
 using std::endl;
@@ -113,7 +117,7 @@ class QXDOptions
         bool mVerbose;
 
         uint32_t getDigits(const string &lookHere, const unsigned pos, bool *ok);
-        bool fileExists(const string &fullPath);
+        bool fileExists(string fullPath);
 
         string mQXLFile;
 

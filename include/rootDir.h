@@ -25,6 +25,10 @@
 #ifndef ROOTDIR_H
 #define ROOTDIR_H
 
+#if defined (__GNUC__)
+	#include <stdint.h>
+#endif
+
 typedef struct rootDir {
     uint32_t hdr_flen;              // File length plus 64. Zero = deleted.
     uint8_t  hdr_accs;              // Access byte.

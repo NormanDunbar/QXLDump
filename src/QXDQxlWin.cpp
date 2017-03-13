@@ -25,8 +25,6 @@
 #include <sstream>
 #include <cctype>
 
-#include "Thousands.h"
-
 using std::stringstream;
 using std::isprint;
 
@@ -508,8 +506,8 @@ void QXDQxlWin::doRoot()
 
     // Show the directory as a table of entries.
     cout << "<h3>Root Directory</h3>" << endl;
-    cout << "The following table shows the entries in the root directory. Unused entries, such as for "
-         << "deleted files, are not listed here. You can see those in the raw data above in '--verbose' mode.</p>" << endl;
+    cout << "The following table shows the entries in the root directory. Unused entries are not listed here, "
+         << "but potentially deleted files are.</p>" << endl;
 
     cout << getDirectoryTable(rootBlock, Header.qwa_rlen) << endl;
 
@@ -619,8 +617,8 @@ void QXDQxlWin::doDirectory(uint16_t blockId)
 
     // Show the directory as a table of entries.
     cout << "<h3>Directory</h3>" << endl;
-    cout << "The following table shows the entries in the directory. Unused entries, such as for "
-         << "deleted files, are not listed here. You can see those in the raw data in '--verbose' mode.</p>" << endl;
+    cout << "The following table shows the entries in the directory. Unused entries are not listed here, but "
+         << "deleted files are.</p>" << endl;
 
     cout << getDirectoryTable(dirBlock, mOptions->QXDDirLength()) << endl;
     cout << "<hr>" << endl << endl;
@@ -779,9 +777,6 @@ string QXDQxlWin::getDirectoryRows(uint16_t blockId, uint16_t numDirEntries, con
     uint16_t thisBlock = blockId;
     stringstream s;
 
-    // Make sure that S gets comma/dot separated thousands etc.
-    s.imbue(locale(s.getloc(), new ThousandsSeparator<char>(',')));
-
     rootDir directory[numDirEntries];
 
     // Convert the blockID to a file offset.
@@ -813,10 +808,12 @@ string QXDQxlWin::getDirectoryRows(uint16_t blockId, uint16_t numDirEntries, con
 
     for (uint16_t x=startEntry; x < numDirEntries; x++) {
 
-        // Don't do deleted entries.
-        if ((!directory[x].hdr_flen &&
-             !directory[x].hdr_flid) ||
-            (!directory[x].hdr_name_size)) {
+        // Don't do empty entries. However, if the
+        // File id is present, the file was deleted previously.
+        // we show those, just in case.
+        if (!directory[x].hdr_flen &&
+            !directory[x].hdr_name_size &&
+            !directory[x].hdr_flid) {
             continue;
         }
 
@@ -857,6 +854,12 @@ string QXDQxlWin::getDirectoryRows(uint16_t blockId, uint16_t numDirEntries, con
         for (uint16_t y = 0; y < directory[x].hdr_name_size; y++) {
             s << directory[x].hdr_name[y];
         }
+
+        // Is this a potentially deleted file?
+        if (!directory[x].hdr_name_size &&
+            !directory[x].hdr_flen) {
+                s << " (Deleted?)";
+            }
         s << "</td>";
 
         // Do the File update date.

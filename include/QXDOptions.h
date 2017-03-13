@@ -37,6 +37,7 @@ using std::string;
 using std::cerr;
 using std::endl;
 using std::ifstream;
+using std::stoul;
 
 class QXDOptions
 {
@@ -117,7 +118,7 @@ class QXDOptions
         bool mVerbose;
 
         uint32_t getDigits(const string &lookHere, const unsigned pos, bool *ok);
-        bool fileExists(string fullPath);
+        bool fileExists(const string &fullPath);
 
         string mQXLFile;
 

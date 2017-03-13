@@ -141,13 +141,13 @@ The size of the directory *must* be supplied. This is to stop the utility trying
 You obtain the directory id number and size from a listing of its parent directory, which could be the root.
 
 ```
-QXLDump c:\qxl.win --directory=61 --size=1024
+QXLDump c:\qxl.win --dir=61 --size=1024
 ```
 
 or
 
 ```
-QXLDump c:\qxl.win --directory=61 --size=1024 --verbose
+QXLDump c:\qxl.win --dir=61 --size=1024 --verbose
 ```
 
 ### File

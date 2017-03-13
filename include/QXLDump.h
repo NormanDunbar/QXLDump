@@ -30,8 +30,6 @@
 #include <string>
 #include <exception>
 
-#include "Thousands.h"
-
 using std::string;
 
 using std::cout;

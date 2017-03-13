@@ -38,10 +38,6 @@ int main(int argc, char *argv[])
     // Sign on. We use cerr as we are keeping cout for the actual dump data.
     cerr << "QXLDump: version " << version << endl << endl;
 
-    // Make sure that cout/cerr gets comma/dot separated thousands etc.
-    cout.imbue(locale(cout.getloc(), new ThousandsSeparator<char>(',')));
-    cerr.imbue(locale(cerr.getloc(), new ThousandsSeparator<char>(',')));
-
     // Parse command line args and bale if problems detected.
     bool allOk = options.parseArgs(argc, argv);
     if (!allOk) {

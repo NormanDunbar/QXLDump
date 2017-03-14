@@ -35,3 +35,5 @@ testFiles/*
 *.save
 include/*.save
 src/*.save
+*.layout
+*.depend

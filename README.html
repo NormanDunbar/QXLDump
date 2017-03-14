@@ -71,9 +71,9 @@ Errors are written to &#39;stderr&#39; and won&#39;t interfere with the data on 
 <p>The directory contents are displayed in a readable format.</p>
 <p>The size of the directory <em>must</em> be supplied. This is to stop the utility trying to read past the logical EOF and into the uncharted and shark infested waters of random garbage which can cause no end of trouble to an innocent dump utility! (Ask me how I know!)</p>
 <p>You obtain the directory id number and size from a listing of its parent directory, which could be the root.</p>
-<pre><code>QXLDump c:\qxl.win --directory=61 --size=1024</code></pre>
+<pre><code>QXLDump c:\qxl.win --dir=61 --size=1024</code></pre>
 <p>or</p>
-<pre><code>QXLDump c:\qxl.win --directory=61 --size=1024 --verbose</code></pre>
+<pre><code>QXLDump c:\qxl.win --dir=61 --size=1024 --verbose</code></pre>
 <h3 id="file">File</h3>
 <p>A dump of the required file's blocks is carried out for the passed fine. The file required must be specified by it's block number, not a name. <code>--verbose</code> will dump out the file's data blocks in hex, if specified.</p>
 <p>You obtain the file id number from a listing of its parent directory, which could be the root.</p>

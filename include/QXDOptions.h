@@ -37,6 +37,7 @@ using std::string;
 using std::cerr;
 using std::endl;
 using std::ifstream;
+using std::stoul;
 
 class QXDOptions
 {

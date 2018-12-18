@@ -1,0 +1,378 @@
+<html>
+<head>
+<title>QXLDump</title>
+<style>
+body {
+    background: ivory;
+    color: maroon;
+}
+
+table, th, td {
+    border: 1px solid bisque;
+}
+
+table {
+    border-collapse: collapse;
+    background: beige;
+    font-family: "courier new","lucida console",mono;
+    font-size: smaller;
+
+    /* If "fixed" is not used, the widths are ignored. Sigh */
+    /* So the <table> is hard coded as <table style="width:95%"> which I don't like. */
+    table-layout: fixed;
+
+    /* Margin is half of 100-95% to accommodate a 95% wide table. */
+    margin-left: 2.5%;
+}
+
+th {
+    background: burlywood;
+    color: maroon;
+}
+
+.right {
+    text-align: right;
+    padding-right: 3px;
+    vertical-align: top;
+}
+
+.left {
+    text-align: left;
+    padding-left: 3px;
+    vertical-align: top;
+}
+.middle {
+    text-align: center;
+    padding-right: 3px;
+    vertical-align: top;
+}
+.hidden {
+    background: ivory;
+    border-left: 1px solid ivory;
+    border-top: 1px solid ivory;
+    border-bottom: 1px solid ivory;
+}
+</style>
+</head>
+<body>
+<h1>QXLDump</H1>
+<p><strong>Qxl.win File Name: </strong>win3.qpc</p>
+
+<h2>File Header</h2>
+The header of the qxl.win file starts at offset zero in the physical file. It takes up the first 64 ($0040) bytes of the file.</p>
+<table style="width:95%">
+<tr><th style="width:5%";>Offset Hex</th><th style="width:5%";>Offset Dec</th><th style="width:10%";>Mnemonic</th><th style="width:10%";>Value</th><th>Description</th></tr>
+<tr><td class="right">$0000</td><td class="right">0</td><td class="left">qwa_id</td><td class="right">QLWA</td><td class="text">QLWA Identification bytes.</td></tr>
+<tr><td class="right">$0004</td><td class="right">4</td><td class="left">qwa_name_size</td><td class="right">4</td><td class="left">Size of QXL.WIN file name.</td></tr>
+<tr><td class="right">$0006</td><td class="right">6</td><td class="left">qwa_name</td><td class="right">WIN3                </td><td class="text">Bytes of QXL.WIN file name.</td></tr>
+<tr><td class="right">$001a</td><td class="right">26</td><td class="left">qwa_spr0</td><td class="right">0</td><td class="left">Spare. Should be zero.</td></tr>
+<tr><td class="right">$001c</td><td class="right">28</td><td class="left">qwa_uchk</td><td class="right">742981938</td><td class="left">Update counter. First word is random. Second is counter.</td></tr>
+<tr><td class="right">$0020</td><td class="right">32</td><td class="left">qwa_intl</td><td class="right">0</td><td class="left">Interleave factor.</td></tr>
+<tr><td class="right">$0022</td><td class="right">34</td><td class="left">qwa_sctg</td><td class="right">4</td><td class="left">Sectors per group.</td></tr>
+<tr><td class="right">$0024</td><td class="right">36</td><td class="left">qwa_sctt</td><td class="right">0</td><td class="left">Sectors per track.</td></tr>
+<tr><td class="right">$0026</td><td class="right">38</td><td class="left">qwa_trkc</td><td class="right">0</td><td class="left">Tracks per cylinder.</td></tr>
+<tr><td class="right">$0028</td><td class="right">40</td><td class="left">qwa_cyld</td><td class="right">0</td><td class="left">Cylinders per drive.</td></tr>
+<tr><td class="right">$002a</td><td class="right">42</td><td class="left">qwa_ngrp</td><td class="right">10240</td><td class="left">Total number of groups.</td></tr>
+<tr><td class="right">$002c</td><td class="right">44</td><td class="left">qwa_fgrp</td><td class="right">3419</td><td class="left">Number of free or unusable groups.</td></tr>
+<tr><td class="right">$002e</td><td class="right">46</td><td class="left">qwa_sctm</td><td class="right">41</td><td class="left">Sectors per map.</td></tr>
+<tr><td class="right">$0030</td><td class="right">48</td><td class="left">qwa_nmap</td><td class="right">1</td><td class="left">Number of maps.</td></tr>
+<tr><td class="right">$0032</td><td class="right">50</td><td class="left">qwa_free</td><td class="right">6821</td><td class="left">First free group.</td></tr>
+<tr><td class="right">$0034</td><td class="right">52</td><td class="left">qwa_root</td><td class="right">11</td><td class="left">Root directory file number.</td></tr>
+<tr><td class="right">$0036</td><td class="right">54</td><td class="left">qwa_rlen</td><td class="right">192</td><td class="left">Root directory length.</td></tr>
+<tr><td class="right">$003a</td><td class="right">58</td><td class="left">qwa_fcyl</td><td class="right">0</td><td class="left">First cylinder (word) *** OR ***</td></tr>
+<tr><td class="right">$003a</td><td class="right">58</td><td class="left">qwa_fsct</td><td class="right">0</td><td class="left">First sector (long word).</td></tr>
+<tr><td class="right">$003e</td><td class="right">62</td><td class="left">qwa_park</td><td class="right">0</td><td class="left">Parking cylinder.</td></tr>
+<tr><td>&nbsp;</td><td class="right" colspan="2"><strong>Total Disc Size:<strong></td><td class="right">20480</td><td>Disc size in Kb.</td></tr>
+<tr><td>&nbsp;</td><td class="right" colspan="2"><strong>Total Free Space:<strong></td><td class="right">6838</td><td>Free space in Kb.</td></tr>
+</table>
+<hr>
+
+<h2>Root Directory</h2>
+<h3>Map Location Data</h3>
+<p>The following table shows the locations, in the map, of the blocks used for the root directory. The root directory is the directory of the qxl.win file itself. This directory is so important that it's location - in the map - is stored in the file header. This allows the physical location within the disc itself, to be determined easily. </p>
+<p>The file id for the root directory in this file is $000b.</p>
+<h3>Root Directory</h3>
+The following table shows the entries in the root directory. Unused entries are not listed here, but potentially deleted files are.</p>
+<p><Strong>Block: $</strong>000b (11)</p>
+<table style="width:95%">
+<tr><th class="middle" style="width:10%">File<br>Length</th><th class="middle" style="width:5%">Acc<br>-ess</th><th class="middle" style="width:5%">File<br>Type</th><th class="middle" style="width:10%">Data<br>Space</th><th class="middle" style="width:10%">File<br>Extra</th><th class="middle" style="width:10%">Name<br>Size</th><th class="middle" style="width:20%">File<br>Name</th><th class="middle" style="width:10%">Update<br>Date</th><th class="middle" style="width:5%">Vers<br>-ion</th><th class="middle" style="width:5%">File<br>Id</th><th class="middle" style="width:10%">Backup<br>date</th></tr>
+<tr><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">0</td><td class="left"> (Deleted?)</td><td class="right">$00000000</td><td class="right">1</td><td class="right">4653</td><td class="right">$00000000</td></tr>
+<tr><td class="right">7232</td><td class="right">0</td><td class="right">255</td><td class="right">0</td><td class="right">$00000000</td><td class="right">7</td><td class="left">sqlite3</td><td class="right">$00001c40</td><td class="right">1</td><td class="right">622</td><td class="right">$00001c40</td></tr>
+</table>
+
+<hr>
+
+<h2>Directory Dump</h2>
+<h3>Directory</h3>
+The following table shows the entries in the directory. Unused entries are not listed here, but deleted files are.</p>
+<p><Strong>Block: $</strong>026e (622)</p>
+<table style="width:95%">
+<tr><th class="middle" style="width:10%">File<br>Length</th><th class="middle" style="width:5%">Acc<br>-ess</th><th class="middle" style="width:5%">File<br>Type</th><th class="middle" style="width:10%">Data<br>Space</th><th class="middle" style="width:10%">File<br>Extra</th><th class="middle" style="width:10%">Name<br>Size</th><th class="middle" style="width:20%">File<br>Name</th><th class="middle" style="width:10%">Update<br>Date</th><th class="middle" style="width:5%">Vers<br>-ion</th><th class="middle" style="width:5%">File<br>Id</th><th class="middle" style="width:10%">Backup<br>date</th></tr>
+<tr><td class="right">320</td><td class="right">0</td><td class="right">255</td><td class="right">0</td><td class="right">$00000000</td><td class="right">20</td><td class="left">sqlite3_amalgamation</td><td class="right">$00000140</td><td class="right">1</td><td class="right">4655</td><td class="right">$00000140</td></tr>
+<tr><td class="right">1485</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_sqlite3.c</td><td class="right">$000005cd</td><td class="right">1</td><td class="right">4656</td><td class="right">$000005cd</td></tr>
+<tr><td class="right">145075</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">19</td><td class="left">sqlite3_sqliteInt.h</td><td class="right">$000236b3</td><td class="right">1</td><td class="right">4657</td><td class="right">$000236b3</td></tr>
+<tr><td class="right">6382</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">21</td><td class="left">sqlite3_sqliteLimit.h</td><td class="right">$000018ee</td><td class="right">1</td><td class="right">4658</td><td class="right">$000018ee</td></tr>
+<tr><td class="right">298816</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_sqlite3.h</td><td class="right">$00048f40</td><td class="right">1</td><td class="right">4667</td><td class="right">$00048f40</td></tr>
+<tr><td class="right">3653</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_hash.h</td><td class="right">$00000e45</td><td class="right">1</td><td class="right">4813</td><td class="right">$00000e45</td></tr>
+<tr><td class="right">7188</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_parse.h</td><td class="right">$00001c14</td><td class="right">1</td><td class="right">4815</td><td class="right">$00001c14</td></tr>
+<tr><td class="right">10287</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_btree.h</td><td class="right">$0000282f</td><td class="right">1</td><td class="right">4824</td><td class="right">$0000282f</td></tr>
+<tr><td class="right">1243</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">25</td><td class="left">sqlite3_de_amalgamate_bas</td><td class="right">$000004db</td><td class="right">1</td><td class="right">4653</td><td class="right">$000004db</td></tr>
+<tr><td class="right">320</td><td class="right">0</td><td class="right">255</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_original</td><td class="right">$00000140</td><td class="right">1</td><td class="right">4654</td><td class="right">$00000140</td></tr>
+<tr><td class="right">9673</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_vdbe.h</td><td class="right">$000025c9</td><td class="right">1</td><td class="right">4830</td><td class="right">$000025c9</td></tr>
+<tr><td class="right">10019</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_opcodes.h</td><td class="right">$00002723</td><td class="right">1</td><td class="right">4834</td><td class="right">$00002723</td></tr>
+<tr><td class="right">7232</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_pager.h</td><td class="right">$00001c40</td><td class="right">1</td><td class="right">4840</td><td class="right">$00001c40</td></tr>
+<tr><td class="right">5994</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_pcache.h</td><td class="right">$0000176a</td><td class="right">1</td><td class="right">4844</td><td class="right">$0000176a</td></tr>
+<tr><td class="right">11304</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">12</td><td class="left">sqlite3_os.h</td><td class="right">$00002c28</td><td class="right">1</td><td class="right">4847</td><td class="right">$00002c28</td></tr>
+<tr><td class="right">2469</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_mutex.h</td><td class="right">$000009a5</td><td class="right">1</td><td class="right">4853</td><td class="right">$000009a5</td></tr>
+<tr><td class="right">10238</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_global.c</td><td class="right">$000027fe</td><td class="right">1</td><td class="right">4915</td><td class="right">$000027fe</td></tr>
+<tr><td class="right">8537</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_ctime.c</td><td class="right">$00002159</td><td class="right">1</td><td class="right">4920</td><td class="right">$00002159</td></tr>
+<tr><td class="right">6916</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_status.c</td><td class="right">$00001b04</td><td class="right">1</td><td class="right">4925</td><td class="right">$00001b04</td></tr>
+<tr><td class="right">19826</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_vdbeInt.h</td><td class="right">$00004d72</td><td class="right">1</td><td class="right">4926</td><td class="right">$00004d72</td></tr>
+<tr><td class="right">27815</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_date.c</td><td class="right">$00006ca7</td><td class="right">1</td><td class="right">4939</td><td class="right">$00006ca7</td></tr>
+<tr><td class="right">10169</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">12</td><td class="left">sqlite3_os.c</td><td class="right">$000027b9</td><td class="right">1</td><td class="right">4953</td><td class="right">$000027b9</td></tr>
+<tr><td class="right">2794</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_fault.c</td><td class="right">$00000aea</td><td class="right">1</td><td class="right">4958</td><td class="right">$00000aea</td></tr>
+<tr><td class="right">1986</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_mem0.c</td><td class="right">$000007c2</td><td class="right">1</td><td class="right">4960</td><td class="right">$000007c2</td></tr>
+<tr><td class="right">4008</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_mem1.c</td><td class="right">$00000fa8</td><td class="right">1</td><td class="right">4961</td><td class="right">$00000fa8</td></tr>
+<tr><td class="right">14822</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_mem2.c</td><td class="right">$000039e6</td><td class="right">1</td><td class="right">4963</td><td class="right">$000039e6</td></tr>
+<tr><td class="right">20293</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_mem3.c</td><td class="right">$00004f45</td><td class="right">1</td><td class="right">4971</td><td class="right">$00004f45</td></tr>
+<tr><td class="right">17135</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_mem5.c</td><td class="right">$000042ef</td><td class="right">1</td><td class="right">4981</td><td class="right">$000042ef</td></tr>
+<tr><td class="right">4251</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_mutex.c</td><td class="right">$0000109b</td><td class="right">1</td><td class="right">4990</td><td class="right">$0000109b</td></tr>
+<tr><td class="right">6084</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">20</td><td class="left">sqlite3_mutex_noop.c</td><td class="right">$000017c4</td><td class="right">1</td><td class="right">4993</td><td class="right">$000017c4</td></tr>
+<tr><td class="right">8370</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">19</td><td class="left">sqlite3_mutex_os2.c</td><td class="right">$000020b2</td><td class="right">1</td><td class="right">4996</td><td class="right">$000020b2</td></tr>
+</table>
+<p><Strong>Block: $</strong>1459 (5209)</p>
+<table style="width:95%">
+<tr><th class="middle" style="width:10%">File<br>Length</th><th class="middle" style="width:5%">Acc<br>-ess</th><th class="middle" style="width:5%">File<br>Type</th><th class="middle" style="width:10%">Data<br>Space</th><th class="middle" style="width:10%">File<br>Extra</th><th class="middle" style="width:10%">Name<br>Size</th><th class="middle" style="width:20%">File<br>Name</th><th class="middle" style="width:10%">Update<br>Date</th><th class="middle" style="width:5%">Vers<br>-ion</th><th class="middle" style="width:5%">File<br>Id</th><th class="middle" style="width:10%">Backup<br>date</th></tr>
+<tr><td class="right">11372</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">20</td><td class="left">sqlite3_mutex_unix.c</td><td class="right">$00002c6c</td><td class="right">1</td><td class="right">5001</td><td class="right">$00002c6c</td></tr>
+<tr><td class="right">10340</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">19</td><td class="left">sqlite3_mutex_w32.c</td><td class="right">$00002864</td><td class="right">1</td><td class="right">5007</td><td class="right">$00002864</td></tr>
+<tr><td class="right">23270</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_malloc.c</td><td class="right">$00005ae6</td><td class="right">1</td><td class="right">5013</td><td class="right">$00005ae6</td></tr>
+<tr><td class="right">33356</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_printf.c</td><td class="right">$0000824c</td><td class="right">1</td><td class="right">5025</td><td class="right">$0000824c</td></tr>
+<tr><td class="right">4771</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_random.c</td><td class="right">$000012a3</td><td class="right">1</td><td class="right">5042</td><td class="right">$000012a3</td></tr>
+<tr><td class="right">18211</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">13</td><td class="left">sqlite3_utf.c</td><td class="right">$00004723</td><td class="right">1</td><td class="right">5045</td><td class="right">$00004723</td></tr>
+<tr><td class="right">28236</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_util.c</td><td class="right">$00006e4c</td><td class="right">1</td><td class="right">5054</td><td class="right">$00006e4c</td></tr>
+<tr><td class="right">7939</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_hash.c</td><td class="right">$00001f03</td><td class="right">1</td><td class="right">5068</td><td class="right">$00001f03</td></tr>
+<tr><td class="right">4154</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_opcodes.c</td><td class="right">$0000103a</td><td class="right">1</td><td class="right">5072</td><td class="right">$0000103a</td></tr>
+<tr><td class="right">35769</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_os_os2.c</td><td class="right">$00008bb9</td><td class="right">1</td><td class="right">5075</td><td class="right">$00008bb9</td></tr>
+<tr><td class="right">3560</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">19</td><td class="left">sqlite3_os_common.h</td><td class="right">$00000de8</td><td class="right">1</td><td class="right">5076</td><td class="right">$00000de8</td></tr>
+<tr><td class="right">2444</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_hwtime.h</td><td class="right">$0000098c</td><td class="right">1</td><td class="right">5077</td><td class="right">$0000098c</td></tr>
+<tr><td class="right">213527</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_os_unix.c</td><td class="right">$00034217</td><td class="right">1</td><td class="right">5097</td><td class="right">$00034217</td></tr>
+<tr><td class="right">85308</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_os_win.c</td><td class="right">$00014d3c</td><td class="right">1</td><td class="right">5202</td><td class="right">$00014d3c</td></tr>
+<tr><td class="right">13304</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_bitvec.c</td><td class="right">$000033f8</td><td class="right">1</td><td class="right">5245</td><td class="right">$000033f8</td></tr>
+<tr><td class="right">16658</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_pcache.c</td><td class="right">$00004112</td><td class="right">1</td><td class="right">5252</td><td class="right">$00004112</td></tr>
+<tr><td class="right">31774</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_pcache1.c</td><td class="right">$00007c1e</td><td class="right">1</td><td class="right">5261</td><td class="right">$00007c1e</td></tr>
+<tr><td class="right">12599</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_rowset.c</td><td class="right">$00003137</td><td class="right">1</td><td class="right">5277</td><td class="right">$00003137</td></tr>
+<tr><td class="right">266103</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_pager.c</td><td class="right">$00040f77</td><td class="right">1</td><td class="right">5284</td><td class="right">$00040f77</td></tr>
+<tr><td class="right">4592</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">13</td><td class="left">sqlite3_wal.h</td><td class="right">$000011f0</td><td class="right">1</td><td class="right">5285</td><td class="right">$000011f0</td></tr>
+<tr><td class="right">105618</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">13</td><td class="left">sqlite3_wal.c</td><td class="right">$00019c92</td><td class="right">1</td><td class="right">5417</td><td class="right">$00019c92</td></tr>
+<tr><td class="right">10731</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_btmutex.c</td><td class="right">$000029eb</td><td class="right">1</td><td class="right">5469</td><td class="right">$000029eb</td></tr>
+<tr><td class="right">29076</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">18</td><td class="left">sqlite3_btreeInt.h</td><td class="right">$00007194</td><td class="right">1</td><td class="right">5470</td><td class="right">$00007194</td></tr>
+<tr><td class="right">277703</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_btree.c</td><td class="right">$00043cc7</td><td class="right">1</td><td class="right">5490</td><td class="right">$00043cc7</td></tr>
+<tr><td class="right">23915</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_backup.c</td><td class="right">$00005d6b</td><td class="right">1</td><td class="right">5627</td><td class="right">$00005d6b</td></tr>
+<tr><td class="right">35936</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_vdbemem.c</td><td class="right">$00008c60</td><td class="right">1</td><td class="right">5639</td><td class="right">$00008c60</td></tr>
+<tr><td class="right">101162</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_vdbeaux.c</td><td class="right">$00018b2a</td><td class="right">1</td><td class="right">5657</td><td class="right">$00018b2a</td></tr>
+<tr><td class="right">41668</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_vdbeapi.c</td><td class="right">$0000a2c4</td><td class="right">1</td><td class="right">5707</td><td class="right">$0000a2c4</td></tr>
+<tr><td class="right">5423</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">19</td><td class="left">sqlite3_vdbetrace.c</td><td class="right">$0000152f</td><td class="right">1</td><td class="right">5728</td><td class="right">$0000152f</td></tr>
+<tr><td class="right">221473</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_vdbe.c</td><td class="right">$00036121</td><td class="right">1</td><td class="right">5731</td><td class="right">$00036121</td></tr>
+<tr><td class="right">14703</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">18</td><td class="left">sqlite3_vdbeblob.c</td><td class="right">$0000396f</td><td class="right">1</td><td class="right">5840</td><td class="right">$0000396f</td></tr>
+<tr><td class="right">6643</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_journal.c</td><td class="right">$000019f3</td><td class="right">1</td><td class="right">5848</td><td class="right">$000019f3</td></tr>
+</table>
+<p><Strong>Block: $</strong>15f6 (5622)</p>
+<table style="width:95%">
+<tr><th class="middle" style="width:10%">File<br>Length</th><th class="middle" style="width:5%">Acc<br>-ess</th><th class="middle" style="width:5%">File<br>Type</th><th class="middle" style="width:10%">Data<br>Space</th><th class="middle" style="width:10%">File<br>Extra</th><th class="middle" style="width:10%">Name<br>Size</th><th class="middle" style="width:20%">File<br>Name</th><th class="middle" style="width:10%">Update<br>Date</th><th class="middle" style="width:5%">Vers<br>-ion</th><th class="middle" style="width:5%">File<br>Id</th><th class="middle" style="width:10%">Backup<br>date</th></tr>
+<tr><td class="right">7559</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">20</td><td class="left">sqlite3_memjournal.c</td><td class="right">$00001d87</td><td class="right">1</td><td class="right">5852</td><td class="right">$00001d87</td></tr>
+<tr><td class="right">4629</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_walker.c</td><td class="right">$00001215</td><td class="right">1</td><td class="right">5856</td><td class="right">$00001215</td></tr>
+<tr><td class="right">41420</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_resolve.c</td><td class="right">$0000a1cc</td><td class="right">1</td><td class="right">5859</td><td class="right">$0000a1cc</td></tr>
+<tr><td class="right">128456</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_expr.c</td><td class="right">$0001f5c8</td><td class="right">1</td><td class="right">5880</td><td class="right">$0001f5c8</td></tr>
+<tr><td class="right">27256</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_alter.c</td><td class="right">$00006a78</td><td class="right">1</td><td class="right">5943</td><td class="right">$00006a78</td></tr>
+<tr><td class="right">24514</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_analyze.c</td><td class="right">$00005fc2</td><td class="right">1</td><td class="right">5957</td><td class="right">$00005fc2</td></tr>
+<tr><td class="right">16243</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_attach.c</td><td class="right">$00003f73</td><td class="right">1</td><td class="right">5969</td><td class="right">$00003f73</td></tr>
+<tr><td class="right">8274</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_auth.c</td><td class="right">$00002052</td><td class="right">1</td><td class="right">5977</td><td class="right">$00002052</td></tr>
+<tr><td class="right">122718</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_build.c</td><td class="right">$0001df5e</td><td class="right">1</td><td class="right">5982</td><td class="right">$0001df5e</td></tr>
+<tr><td class="right">15413</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">18</td><td class="left">sqlite3_callback.c</td><td class="right">$00003c35</td><td class="right">1</td><td class="right">6042</td><td class="right">$00003c35</td></tr>
+<tr><td class="right">23220</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_delete.c</td><td class="right">$00005ab4</td><td class="right">1</td><td class="right">6050</td><td class="right">$00005ab4</td></tr>
+<tr><td class="right">49192</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_func.c</td><td class="right">$0000c028</td><td class="right">1</td><td class="right">6062</td><td class="right">$0000c028</td></tr>
+<tr><td class="right">48248</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_fkey.c</td><td class="right">$0000bc78</td><td class="right">1</td><td class="right">6087</td><td class="right">$0000bc78</td></tr>
+<tr><td class="right">66448</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_insert.c</td><td class="right">$00010390</td><td class="right">1</td><td class="right">6111</td><td class="right">$00010390</td></tr>
+<tr><td class="right">4688</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_legacy.c</td><td class="right">$00001250</td><td class="right">1</td><td class="right">6144</td><td class="right">$00001250</td></tr>
+<tr><td class="right">17275</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_loadext.c</td><td class="right">$0000437b</td><td class="right">1</td><td class="right">6147</td><td class="right">$0000437b</td></tr>
+<tr><td class="right">23266</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">20</td><td class="left">sqlite3_sqlite3ext.h</td><td class="right">$00005ae2</td><td class="right">1</td><td class="right">6148</td><td class="right">$00005ae2</td></tr>
+<tr><td class="right">53885</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_pragma.c</td><td class="right">$0000d27d</td><td class="right">1</td><td class="right">6168</td><td class="right">$0000d27d</td></tr>
+<tr><td class="right">28577</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_prepare.c</td><td class="right">$00006fa1</td><td class="right">1</td><td class="right">6195</td><td class="right">$00006fa1</td></tr>
+<tr><td class="right">159458</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_select.c</td><td class="right">$00026ee2</td><td class="right">1</td><td class="right">6209</td><td class="right">$00026ee2</td></tr>
+<tr><td class="right">6045</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_table.c</td><td class="right">$0000179d</td><td class="right">1</td><td class="right">6288</td><td class="right">$0000179d</td></tr>
+<tr><td class="right">39692</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_trigger.c</td><td class="right">$00009b0c</td><td class="right">1</td><td class="right">6291</td><td class="right">$00009b0c</td></tr>
+<tr><td class="right">24175</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_update.c</td><td class="right">$00005e6f</td><td class="right">1</td><td class="right">6311</td><td class="right">$00005e6f</td></tr>
+<tr><td class="right">12389</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_vacuum.c</td><td class="right">$00003065</td><td class="right">1</td><td class="right">6323</td><td class="right">$00003065</td></tr>
+<tr><td class="right">29787</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_vtab.c</td><td class="right">$0000745b</td><td class="right">1</td><td class="right">6330</td><td class="right">$0000745b</td></tr>
+<tr><td class="right">180728</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_where.c</td><td class="right">$0002c1f8</td><td class="right">1</td><td class="right">6345</td><td class="right">$0002c1f8</td></tr>
+<tr><td class="right">143447</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_parse.c</td><td class="right">$00023057</td><td class="right">1</td><td class="right">6434</td><td class="right">$00023057</td></tr>
+<tr><td class="right">15955</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">18</td><td class="left">sqlite3_tokenize.c</td><td class="right">$00003e53</td><td class="right">1</td><td class="right">6505</td><td class="right">$00003e53</td></tr>
+<tr><td class="right">13709</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">21</td><td class="left">sqlite3_keywordhash.h</td><td class="right">$0000358d</td><td class="right">1</td><td class="right">6507</td><td class="right">$0000358d</td></tr>
+<tr><td class="right">9221</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">18</td><td class="left">sqlite3_complete.c</td><td class="right">$00002405</td><td class="right">1</td><td class="right">6520</td><td class="right">$00002405</td></tr>
+<tr><td class="right">79576</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_main.c</td><td class="right">$000136d8</td><td class="right">1</td><td class="right">6525</td><td class="right">$000136d8</td></tr>
+<tr><td class="right">738</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_fts3.h</td><td class="right">$000002e2</td><td class="right">1</td><td class="right">6526</td><td class="right">$000002e2</td></tr>
+</table>
+<p><Strong>Block: $</strong>1849 (6217)</p>
+<table style="width:95%">
+<tr><th class="middle" style="width:10%">File<br>Length</th><th class="middle" style="width:5%">Acc<br>-ess</th><th class="middle" style="width:5%">File<br>Type</th><th class="middle" style="width:10%">Data<br>Space</th><th class="middle" style="width:10%">File<br>Extra</th><th class="middle" style="width:10%">Name<br>Size</th><th class="middle" style="width:20%">File<br>Name</th><th class="middle" style="width:10%">Update<br>Date</th><th class="middle" style="width:5%">Vers<br>-ion</th><th class="middle" style="width:5%">File<br>Id</th><th class="middle" style="width:10%">Backup<br>date</th></tr>
+<tr><td class="right">741</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_rtree.h</td><td class="right">$000002e5</td><td class="right">1</td><td class="right">6527</td><td class="right">$000002e5</td></tr>
+<tr><td class="right">738</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">19</td><td class="left">sqlite3_sqliteicu.h</td><td class="right">$000002e2</td><td class="right">1</td><td class="right">6528</td><td class="right">$000002e2</td></tr>
+<tr><td class="right">10704</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">16</td><td class="left">sqlite3_notify.c</td><td class="right">$000029d0</td><td class="right">1</td><td class="right">6567</td><td class="right">$000029d0</td></tr>
+<tr><td class="right">118633</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">14</td><td class="left">sqlite3_fts3.c</td><td class="right">$0001cf69</td><td class="right">1</td><td class="right">6573</td><td class="right">$0001cf69</td></tr>
+<tr><td class="right">14429</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">17</td><td class="left">sqlite3_fts3Int.h</td><td class="right">$0000385d</td><td class="right">1</td><td class="right">6580</td><td class="right">$0000385d</td></tr>
+<tr><td class="right">6164</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">24</td><td class="left">sqlite3_fts3_tokenizer.h</td><td class="right">$00001814</td><td class="right">1</td><td class="right">6581</td><td class="right">$00001814</td></tr>
+<tr><td class="right">4217</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">19</td><td class="left">sqlite3_fts3_hash.h</td><td class="right">$00001079</td><td class="right">1</td><td class="right">6585</td><td class="right">$00001079</td></tr>
+<tr><td class="right">30013</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">19</td><td class="left">sqlite3_fts3_expr.c</td><td class="right">$0000753d</td><td class="right">1</td><td class="right">6646</td><td class="right">$0000753d</td></tr>
+<tr><td class="right">11597</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">19</td><td class="left">sqlite3_fts3_hash.c</td><td class="right">$00002d4d</td><td class="right">1</td><td class="right">6661</td><td class="right">$00002d4d</td></tr>
+<tr><td class="right">17264</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">21</td><td class="left">sqlite3_fts3_porter.c</td><td class="right">$00004370</td><td class="right">1</td><td class="right">6667</td><td class="right">$00004370</td></tr>
+<tr><td class="right">13809</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">24</td><td class="left">sqlite3_fts3_tokenizer.c</td><td class="right">$000035f1</td><td class="right">1</td><td class="right">6676</td><td class="right">$000035f1</td></tr>
+<tr><td class="right">6587</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">25</td><td class="left">sqlite3_fts3_tokenizer1.c</td><td class="right">$000019bb</td><td class="right">1</td><td class="right">6683</td><td class="right">$000019bb</td></tr>
+<tr><td class="right">98627</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">20</td><td class="left">sqlite3_fts3_write.c</td><td class="right">$00018143</td><td class="right">1</td><td class="right">6687</td><td class="right">$00018143</td></tr>
+<tr><td class="right">54309</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">22</td><td class="left">sqlite3_fts3_snippet.c</td><td class="right">$0000d425</td><td class="right">1</td><td class="right">6736</td><td class="right">$0000d425</td></tr>
+<tr><td class="right">92905</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">15</td><td class="left">sqlite3_rtree.c</td><td class="right">$00016ae9</td><td class="right">1</td><td class="right">6763</td><td class="right">$00016ae9</td></tr>
+<tr><td class="right">14616</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">13</td><td class="left">sqlite3_icu.c</td><td class="right">$00003918</td><td class="right">1</td><td class="right">6809</td><td class="right">$00003918</td></tr>
+<tr><td class="right">6674</td><td class="right">0</td><td class="right">0</td><td class="right">0</td><td class="right">$00000000</td><td class="right">18</td><td class="left">sqlite3_fts3_icu.c</td><td class="right">$00001a12</td><td class="right">1</td><td class="right">6817</td><td class="right">$00001a12</td></tr>
+</table>
+
+<hr>
+
+<h2>Data Block</h2>
+<p>Note that when dumping a single data block that the first 64 bytes <em>may not</em> be part of the actual data in the block, if and only if, the block is the <em>first</em> block in the appropriate data file.</p>
+<p>Similarly, if a block is the <em>final</em> one in a file or directory, then some of the displayed data below, may be random garbage left over from previous use of the sectors which make up the final block of a file or directory.</p>
+<h3>Block Data</h3>
+<p>The following table is a hex dump of data block 4653.
+<p><Strong>Block: $</strong>122d (4653)</p>
+<table style="width:70%">
+<tr><th class="middle" style="width:10%">Offset</th><th class="middle" style="width:45%">Hex Codes</th><th class="middle" style="width:15%">ASCII Codes</th></tr>
+<tr><td class="middle">$00916800</td><td class="middle">20 2a 70 43 6f 6c 6c 3b 0a 20 20 20 20 20 20 63 </td><td class="middle"> *pColl;.      c</td></tr>
+<tr><td class="middle">$00916810</td><td class="middle">6f 6e 73 74 20 75 38 20 2a 7a 3b 0a 20 20 20 20 </td><td class="middle">onst u8 *z;.    </td></tr>
+<tr><td class="middle">$00916820</td><td class="middle">20 20 69 6e 74 20 6e 3b 0a 0a 20 20 20 20 20 20 </td><td class="middle">  int n;..      </td></tr>
+<tr><td class="middle">$00916830</td><td class="middle">2f 2a 20 70 56 61 6c 20 63 6f 6d 65 73 20 66 72 </td><td class="middle">/* pVal comes fr</td></tr>
+<tr><td class="middle">$00916840</td><td class="middle">31 30 30 30 20 52 45 4d 61 72 6b 20 53 51 4c 49 </td><td class="middle">1000 REMark SQLI</td></tr>
+<tr><td class="middle">$00916850</td><td class="middle">54 45 33 20 2d 20 44 65 2d 61 6d 61 6c 67 61 66 </td><td class="middle">TE3 - De-amalgaf</td></tr>
+<tr><td class="middle">$00916860</td><td class="middle">69 65 72 21 0a 31 30 31 30 20 3a 0a 31 30 32 30 </td><td class="middle">ier!.1010 :.1020</td></tr>
+<tr><td class="middle">$00916870</td><td class="middle">20 52 45 4d 61 72 6b 20 57 68 65 72 65 20 77 65 </td><td class="middle"> REMark Where we</td></tr>
+<tr><td class="middle">$00916880</td><td class="middle">20 61 72 65 20 72 65 61 64 69 6e 67 20 66 72 6f </td><td class="middle"> are reading fro</td></tr>
+<tr><td class="middle">$00916890</td><td class="middle">6d 2e 2e 2e 0a 31 30 33 30 20 53 6f 75 72 63 65 </td><td class="middle">m....1030 Source</td></tr>
+<tr><td class="middle">$009168a0</td><td class="middle">44 69 72 24 3d 27 77 69 6e 33 5f 73 71 6c 69 74 </td><td class="middle">Dir$='win3_sqlit</td></tr>
+<tr><td class="middle">$009168b0</td><td class="middle">65 33 5f 61 6d 61 6c 67 61 6d 61 74 69 6f 6e 5f </td><td class="middle">e3_amalgamation_</td></tr>
+<tr><td class="middle">$009168c0</td><td class="middle">27 0a 31 30 34 30 20 52 45 4d 61 72 6b 20 46 69 </td><td class="middle">'.1040 REMark Fi</td></tr>
+<tr><td class="middle">$009168d0</td><td class="middle">6c 65 20 77 65 20 61 72 65 20 72 65 61 64 69 6e </td><td class="middle">le we are readin</td></tr>
+<tr><td class="middle">$009168e0</td><td class="middle">67 20 66 72 6f 6d 2e 2e 2e 0a 31 30 35 30 20 53 </td><td class="middle">g from....1050 S</td></tr>
+<tr><td class="middle">$009168f0</td><td class="middle">6f 75 72 63 65 46 69 6c 65 24 3d 53 6f 75 72 63 </td><td class="middle">ourceFile$=Sourc</td></tr>
+<tr><td class="middle">$00916900</td><td class="middle">65 44 69 72 24 20 20 26 20 27 73 71 6c 69 74 65 </td><td class="middle">eDir$  & 'sqlite</td></tr>
+<tr><td class="middle">$00916910</td><td class="middle">33 5f 63 27 0a 31 30 36 30 20 52 45 4d 61 72 6b </td><td class="middle">3_c'.1060 REMark</td></tr>
+<tr><td class="middle">$00916920</td><td class="middle">20 57 68 65 72 65 20 77 65 20 61 72 65 20 77 72 </td><td class="middle"> Where we are wr</td></tr>
+<tr><td class="middle">$00916930</td><td class="middle">69 74 69 6e 67 20 74 6f 2e 2e 2e 0a 31 30 37 30 </td><td class="middle">iting to....1070</td></tr>
+<tr><td class="middle">$00916940</td><td class="middle">20 44 65 73 74 44 69 72 24 20 3d 20 27 72 61 6d </td><td class="middle"> DestDir$ = 'ram</td></tr>
+<tr><td class="middle">$00916950</td><td class="middle">31 5f 27 0a 31 30 38 30 20 52 45 4d 61 72 6b 20 </td><td class="middle">1_'.1080 REMark </td></tr>
+<tr><td class="middle">$00916960</td><td class="middle">4f 75 72 20 66 69 72 73 74 20 6f 75 74 70 75 74 </td><td class="middle">Our first output</td></tr>
+<tr><td class="middle">$00916970</td><td class="middle">20 66 69 6c 65 2e 2e 2e 0a 31 30 39 30 20 44 65 </td><td class="middle"> file....1090 De</td></tr>
+<tr><td class="middle">$00916980</td><td class="middle">73 74 46 69 6c 65 24 3d 27 71 6c 5f 73 71 6c 69 </td><td class="middle">stFile$='ql_sqli</td></tr>
+<tr><td class="middle">$00916990</td><td class="middle">74 65 5f 63 27 0a 31 31 30 30 20 46 69 6c 65 53 </td><td class="middle">te_c'.1100 FileS</td></tr>
+<tr><td class="middle">$009169a0</td><td class="middle">70 6c 69 74 74 65 72 24 20 3d 20 27 2f 2a 2a 2a </td><td class="middle">plitter$ = '/***</td></tr>
+<tr><td class="middle">$009169b0</td><td class="middle">2a 2a 2a 2a 2a 2a 2a 2a 2a 2a 2a 20 42 65 67 69 </td><td class="middle">*********** Begi</td></tr>
+<tr><td class="middle">$009169c0</td><td class="middle">6e 20 46 69 6c 65 20 27 0a 31 31 31 30 20 53 70 </td><td class="middle">n File '.1110 Sp</td></tr>
+<tr><td class="middle">$009169d0</td><td class="middle">6c 69 74 74 65 72 53 69 7a 65 20 3d 20 4c 45 4e </td><td class="middle">litterSize = LEN</td></tr>
+<tr><td class="middle">$009169e0</td><td class="middle">28 46 69 6c 65 53 70 6c 69 74 74 65 72 24 29 0a </td><td class="middle">(FileSplitter$).</td></tr>
+<tr><td class="middle">$009169f0</td><td class="middle">31 31 32 30 20 3a 0a 31 31 33 30 20 4f 50 45 4e </td><td class="middle">1120 :.1130 OPEN</td></tr>
+<tr><td class="middle">$00916a00</td><td class="middle">5f 49 4e 20 23 33 2c 20 53 6f 75 72 63 65 46 69 </td><td class="middle">_IN #3, SourceFi</td></tr>
+<tr><td class="middle">$00916a10</td><td class="middle">6c 65 24 0a 31 31 34 30 20 20 20 4f 50 45 4e 5f </td><td class="middle">le$.1140   OPEN_</td></tr>
+<tr><td class="middle">$00916a20</td><td class="middle">4f 56 45 52 20 23 34 2c 20 44 65 73 74 44 69 72 </td><td class="middle">OVER #4, DestDir</td></tr>
+<tr><td class="middle">$00916a30</td><td class="middle">24 20 26 20 44 65 73 74 46 69 6c 65 24 0a 31 31 </td><td class="middle">$ & DestFile$.11</td></tr>
+<tr><td class="middle">$00916a40</td><td class="middle">35 30 20 3a 0a 31 31 36 30 20 52 45 50 65 61 74 </td><td class="middle">50 :.1160 REPeat</td></tr>
+<tr><td class="middle">$00916a50</td><td class="middle">20 6c 6f 6f 70 0a 31 31 37 30 20 20 20 49 46 20 </td><td class="middle"> loop.1170   IF </td></tr>
+<tr><td class="middle">$00916a60</td><td class="middle">45 4f 46 28 23 33 29 20 54 48 45 4e 20 45 58 49 </td><td class="middle">EOF(#3) THEN EXI</td></tr>
+<tr><td class="middle">$00916a70</td><td class="middle">54 20 6c 6f 6f 70 3a 20 45 4e 44 20 49 46 0a 31 </td><td class="middle">T loop: END IF.1</td></tr>
+<tr><td class="middle">$00916a80</td><td class="middle">31 38 30 20 20 20 49 4e 50 55 54 20 23 33 2c 20 </td><td class="middle">180   INPUT #3, </td></tr>
+<tr><td class="middle">$00916a90</td><td class="middle">6c 69 6e 65 24 0a 31 31 39 30 20 20 20 3a 0a 31 </td><td class="middle">line$.1190   :.1</td></tr>
+<tr><td class="middle">$00916aa0</td><td class="middle">32 30 30 20 20 20 52 45 4d 61 72 6b 20 44 6f 20 </td><td class="middle">200   REMark Do </td></tr>
+<tr><td class="middle">$00916ab0</td><td class="middle">77 65 20 68 61 76 65 20 61 20 66 69 6c 65 20 73 </td><td class="middle">we have a file s</td></tr>
+<tr><td class="middle">$00916ac0</td><td class="middle">70 6c 69 74 74 65 72 3f 0a 31 32 31 30 20 20 20 </td><td class="middle">plitter?.1210   </td></tr>
+<tr><td class="middle">$00916ad0</td><td class="middle">49 46 20 6c 69 6e 65 24 28 31 20 54 4f 20 53 70 </td><td class="middle">IF line$(1 TO Sp</td></tr>
+<tr><td class="middle">$00916ae0</td><td class="middle">6c 69 74 74 65 72 53 69 7a 65 29 20 3d 3d 20 46 </td><td class="middle">litterSize) == F</td></tr>
+<tr><td class="middle">$00916af0</td><td class="middle">69 6c 65 53 70 6c 69 74 74 65 72 24 20 54 48 45 </td><td class="middle">ileSplitter$ THE</td></tr>
+<tr><td class="middle">$00916b00</td><td class="middle">4e 0a 31 32 32 30 20 20 20 20 20 52 45 4d 61 72 </td><td class="middle">N.1220     REMar</td></tr>
+<tr><td class="middle">$00916b10</td><td class="middle">6b 20 59 65 73 20 77 65 20 64 6f 21 0a 31 32 33 </td><td class="middle">k Yes we do!.123</td></tr>
+<tr><td class="middle">$00916b20</td><td class="middle">30 20 20 20 20 20 43 4c 4f 53 45 20 23 34 0a 31 </td><td class="middle">0     CLOSE #4.1</td></tr>
+<tr><td class="middle">$00916b30</td><td class="middle">32 34 30 20 20 20 20 20 44 65 73 74 46 69 6c 65 </td><td class="middle">240     DestFile</td></tr>
+<tr><td class="middle">$00916b40</td><td class="middle">24 20 3d 20 6c 69 6e 65 24 28 53 70 6c 69 74 74 </td><td class="middle">$ = line$(Splitt</td></tr>
+<tr><td class="middle">$00916b50</td><td class="middle">65 72 53 69 7a 65 20 2b 20 31 20 54 4f 20 29 0a </td><td class="middle">erSize + 1 TO ).</td></tr>
+<tr><td class="middle">$00916b60</td><td class="middle">31 32 35 30 20 20 20 20 20 44 65 73 74 46 69 6c </td><td class="middle">1250     DestFil</td></tr>
+<tr><td class="middle">$00916b70</td><td class="middle">65 24 20 3d 20 44 65 73 74 46 69 6c 65 24 28 31 </td><td class="middle">e$ = DestFile$(1</td></tr>
+<tr><td class="middle">$00916b80</td><td class="middle">20 54 4f 20 28 27 20 2a 27 20 49 4e 53 54 52 20 </td><td class="middle"> TO (' *' INSTR </td></tr>
+<tr><td class="middle">$00916b90</td><td class="middle">44 65 73 74 46 69 6c 65 24 29 20 2d 31 29 0a 31 </td><td class="middle">DestFile$) -1).1</td></tr>
+<tr><td class="middle">$00916ba0</td><td class="middle">32 36 30 20 20 20 20 20 44 65 73 74 46 69 6c 65 </td><td class="middle">260     DestFile</td></tr>
+<tr><td class="middle">$00916bb0</td><td class="middle">24 28 4c 45 4e 28 44 65 73 74 46 69 6c 65 24 29 </td><td class="middle">$(LEN(DestFile$)</td></tr>
+<tr><td class="middle">$00916bc0</td><td class="middle">20 2d 31 29 20 3d 20 27 5f 27 0a 31 32 37 30 20 </td><td class="middle"> -1) = '_'.1270 </td></tr>
+<tr><td class="middle">$00916bd0</td><td class="middle">20 20 20 20 50 52 49 4e 54 20 44 65 73 74 46 69 </td><td class="middle">    PRINT DestFi</td></tr>
+<tr><td class="middle">$00916be0</td><td class="middle">6c 65 24 0a 31 32 38 30 20 20 20 20 20 4f 50 45 </td><td class="middle">le$.1280     OPE</td></tr>
+<tr><td class="middle">$00916bf0</td><td class="middle">4e 5f 4f 56 45 52 20 23 34 2c 20 44 65 73 74 44 </td><td class="middle">N_OVER #4, DestD</td></tr>
+<tr><td class="middle">$00916c00</td><td class="middle">69 72 24 20 26 20 44 65 73 74 46 69 6c 65 24 0a </td><td class="middle">ir$ & DestFile$.</td></tr>
+<tr><td class="middle">$00916c10</td><td class="middle">31 32 39 30 20 20 20 45 4e 44 20 49 46 0a 31 33 </td><td class="middle">1290   END IF.13</td></tr>
+<tr><td class="middle">$00916c20</td><td class="middle">30 30 20 20 20 50 52 49 4e 54 20 23 34 2c 20 6c </td><td class="middle">00   PRINT #4, l</td></tr>
+<tr><td class="middle">$00916c30</td><td class="middle">69 6e 65 24 0a 33 30 30 30 20 45 4e 44 20 52 45 </td><td class="middle">ine$.3000 END RE</td></tr>
+<tr><td class="middle">$00916c40</td><td class="middle">50 65 61 74 20 6c 6f 6f 70 0a 33 30 31 30 20 3a </td><td class="middle">Peat loop.3010 :</td></tr>
+<tr><td class="middle">$00916c50</td><td class="middle">0a 33 30 32 30 20 43 4c 4f 53 45 20 23 34 0a 33 </td><td class="middle">.3020 CLOSE #4.3</td></tr>
+<tr><td class="middle">$00916c60</td><td class="middle">30 33 30 20 43 4c 4f 53 45 20 23 33 0a 33 30 34 </td><td class="middle">030 CLOSE #3.304</td></tr>
+<tr><td class="middle">$00916c70</td><td class="middle">30 20 53 54 4f 50 0a 33 30 35 30 20 3a 0a 33 30 </td><td class="middle">0 STOP.3050 :.30</td></tr>
+<tr><td class="middle">$00916c80</td><td class="middle">36 30 20 3a 0a 33 30 37 30 20 44 45 46 69 6e 65 </td><td class="middle">60 :.3070 DEFine</td></tr>
+<tr><td class="middle">$00916c90</td><td class="middle">20 50 52 4f 43 65 64 75 72 65 20 73 61 0a 33 30 </td><td class="middle"> PROCedure sa.30</td></tr>
+<tr><td class="middle">$00916ca0</td><td class="middle">38 30 20 20 20 53 41 56 45 5f 4f 20 77 69 6e 33 </td><td class="middle">80   SAVE_O win3</td></tr>
+<tr><td class="middle">$00916cb0</td><td class="middle">5f 73 71 6c 69 74 65 33 5f 64 65 5f 61 6d 61 6c </td><td class="middle">_sqlite3_de_amal</td></tr>
+<tr><td class="middle">$00916cc0</td><td class="middle">67 61 6d 61 74 65 5f 62 61 73 0a 33 30 39 30 20 </td><td class="middle">gamate_bas.3090 </td></tr>
+<tr><td class="middle">$00916cd0</td><td class="middle">45 4e 44 20 44 45 46 69 6e 65 0a 29 3b 0a 20 20 </td><td class="middle">END DEFine.);.  </td></tr>
+<tr><td class="middle">$00916ce0</td><td class="middle">20 20 20 20 20 20 20 20 69 66 28 20 21 7a 53 61 </td><td class="middle">        if( !zSa</td></tr>
+<tr><td class="middle">$00916cf0</td><td class="middle">6d 70 6c 65 20 29 7b 0a 20 20 20 20 20 20 20 20 </td><td class="middle">mple ){.        </td></tr>
+<tr><td class="middle">$00916d00</td><td class="middle">20 20 20 20 61 73 73 65 72 74 28 20 64 62 2d 3e </td><td class="middle">    assert( db-></td></tr>
+<tr><td class="middle">$00916d10</td><td class="middle">6d 61 6c 6c 6f 63 46 61 69 6c 65 64 20 29 3b 0a </td><td class="middle">mallocFailed );.</td></tr>
+<tr><td class="middle">$00916d20</td><td class="middle">20 20 20 20 20 20 20 20 20 20 20 20 72 65 74 75 </td><td class="middle">            retu</td></tr>
+<tr><td class="middle">$00916d30</td><td class="middle">72 6e 20 53 51 4c 49 54 45 5f 4e 4f 4d 45 4d 3b </td><td class="middle">rn SQLITE_NOMEM;</td></tr>
+<tr><td class="middle">$00916d40</td><td class="middle">0a 20 20 20 20 20 20 20 20 20 20 7d 0a 20 20 20 </td><td class="middle">.          }.   </td></tr>
+<tr><td class="middle">$00916d50</td><td class="middle">20 20 20 20 20 20 20 72 20 3d 20 70 43 6f 6c 6c </td><td class="middle">       r = pColl</td></tr>
+<tr><td class="middle">$00916d60</td><td class="middle">2d 3e 78 43 6d 70 28 70 43 6f 6c 6c 2d 3e 70 55 </td><td class="middle">->xCmp(pColl->pU</td></tr>
+<tr><td class="middle">$00916d70</td><td class="middle">73 65 72 2c 20 6e 53 61 6d 70 6c 65 2c 20 7a 53 </td><td class="middle">ser, nSample, zS</td></tr>
+<tr><td class="middle">$00916d80</td><td class="middle">61 6d 70 6c 65 2c 20 6e 2c 20 7a 29 3b 0a 20 20 </td><td class="middle">ample, n, z);.  </td></tr>
+<tr><td class="middle">$00916d90</td><td class="middle">20 20 20 20 20 20 20 20 73 71 6c 69 74 65 33 44 </td><td class="middle">        sqlite3D</td></tr>
+<tr><td class="middle">$00916da0</td><td class="middle">62 46 72 65 65 28 64 62 2c 20 7a 53 61 6d 70 6c </td><td class="middle">bFree(db, zSampl</td></tr>
+<tr><td class="middle">$00916db0</td><td class="middle">65 29 3b 0a 20 20 20 20 20 20 20 20 7d 65 6c 73 </td><td class="middle">e);.        }els</td></tr>
+<tr><td class="middle">$00916dc0</td><td class="middle">65 0a 23 65 6e 64 69 66 0a 20 20 20 20 20 20 20 </td><td class="middle">e.#endif.       </td></tr>
+<tr><td class="middle">$00916dd0</td><td class="middle">20 7b 0a 20 20 20 20 20 20 20 20 20 20 72 20 3d </td><td class="middle"> {.          r =</td></tr>
+<tr><td class="middle">$00916de0</td><td class="middle">20 70 43 6f 6c 6c 2d 3e 78 43 6d 70 28 70 43 6f </td><td class="middle"> pColl->xCmp(pCo</td></tr>
+<tr><td class="middle">$00916df0</td><td class="middle">6c 6c 2d 3e 70 55 73 65 72 2c 20 61 53 61 6d 70 </td><td class="middle">ll->pUser, aSamp</td></tr>
+<tr><td class="middle">$00916e00</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916e10</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916e20</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916e30</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916e40</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916e50</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916e60</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916e70</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916e80</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916e90</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916ea0</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916eb0</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916ec0</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916ed0</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916ee0</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916ef0</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916f00</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916f10</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916f20</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916f30</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916f40</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916f50</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916f60</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916f70</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916f80</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916f90</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916fa0</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916fb0</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916fc0</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916fd0</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916fe0</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+<tr><td class="middle">$00916ff0</td><td class="middle">00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 </td><td class="middle">................</td></tr>
+</table>
+
+<hr>
+

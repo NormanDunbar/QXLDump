@@ -117,7 +117,7 @@ class QXDOptions
         bool mVerbose;
 
         uint32_t getDigits(const string &lookHere, const unsigned pos, bool *ok);
-        bool fileExists(string fullPath);
+        bool fileExists(const string &fullPath);
 
         string mQXLFile;
 

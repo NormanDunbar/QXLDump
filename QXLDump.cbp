@@ -5,12 +5,20 @@
 		<Option title="QXLDump" />
 		<Option pch_mode="2" />
 		<Option compiler="bcc" />
+		<MakeCommands>
+			<Build command="" />
+			<CompileFile command="" />
+			<Clean command="" />
+			<DistClean command="" />
+			<AskRebuildNeeded command="" />
+			<SilentBuild command=" &gt; $(CMD_NULL)" />
+		</MakeCommands>
 		<Build>
 			<Target title="Release">
 				<Option output="bin/Release/QXLDump" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj/Release/" />
 				<Option type="1" />
-				<Option compiler="bcc" />
+				<Option compiler="gcc" />
 				<Option parameters="c:\sourcecode\qxldump\testFiles\qxl.win" />
 				<Compiler>
 					<Add option="-O2" />
@@ -18,14 +26,6 @@
 				</Compiler>
 			</Target>
 		</Build>
-		<Compiler>
-			<Add option="-w" />
-			<Add option="-x" />
-		</Compiler>
-		<Linker>
-			<Add library="cw32mt.lib" />
-			<Add library="import32.lib" />
-		</Linker>
 		<Unit filename="include/QXDOptions.h" />
 		<Unit filename="include/QXDQxlWin.h" />
 		<Unit filename="include/QXLDump.h" />

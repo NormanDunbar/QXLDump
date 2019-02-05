@@ -46,3 +46,38 @@
 
 1489062884 c:\sourcecode\qxldump\include\rootdir.h
 
+1549385349 source:/data/SourceCode/QXLDump/src/QXDQxlWin.cpp
+	<sstream>
+	<cctype>
+	"Thousands.h"
+	"QXDQxlWin.h"
+	"css.h"
+	"rootDir.h"
+
+1549385349 /data/SourceCode/QXLDump/include/Thousands.h
+	<string>
+	<iomanip>
+
+1549385349 /data/SourceCode/QXLDump/include/QXDQxlWin.h
+	<iostream>
+	<iomanip>
+	<fstream>
+	<string>
+	"QXDOptions.h"
+	"QXLHeader.h"
+
+1549385622 /data/SourceCode/QXLDump/include/QXDOptions.h
+	<string>
+	<iostream>
+	<fstream>
+	<stdint.h>
+
+1549385349 /data/SourceCode/QXLDump/include/QXLHeader.h
+	<stdint.h>
+
+1549385349 /data/SourceCode/QXLDump/include/css.h
+	<string>
+
+1549385349 /data/SourceCode/QXLDump/include/rootDir.h
+	<stdint.h>
+

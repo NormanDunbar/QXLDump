@@ -156,10 +156,14 @@ void QXDQxlWin::doHeader()
 
     // Header data. Update Check.
     offset += 2;
-    displayData(offset, 8, Header.qwa_uchk, "qwa_uchk", "Update counter. First word is random. Second is counter.");
+    displayData(offset, 4, Header.qwa_frmt, "qwa_uchk(HI)", "Format random number.");
+
+    // Header data. Update Check.
+    offset += 2;
+    displayData(offset, 4, Header.qwa_uchk, "qwa_uchk(LO)", "Update counter.");
 
     // Header data. Interleave factor.
-    offset += 4;
+    offset += 2;
     displayData(offset, 4, Header.qwa_intl, "qwa_intl", "Interleave factor.");
 
     // Header data. Sectors per group.

@@ -37,7 +37,8 @@ typedef struct QXLHeader {
     uint16_t qwa_name_size;         // Size of the following name.
     char qwa_name[20];              // Space filled bytes of the name.
     uint16_t qwa_spr0;              // Spare - should be zero.
-    uint32_t qwa_uchk;              // Update counter.
+    uint16_t qwa_frmt;              // Format Random number.
+    uint16_t qwa_uchk;              // Update counter.
     uint16_t qwa_intl;              // Interleave factor. 0 = SCSI/QXL.WIN.
     uint16_t qwa_sctg;              // Sectors per group.
     uint16_t qwa_sctt;              // Sectors per track. 0 = SCSI/QXL.WIN.
